@@ -139,8 +139,7 @@ bot(
  },
  async (message, match, m, client) => {
   if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.sendReply('_Reply Status_');
-  let quotedMsg = m;
-  await message.forward(message.user, m.quoted.message, { quoted: quotedMsg });
+  return await message.forward(message.user, m.quoted);
  }
 );
 
@@ -148,14 +147,29 @@ bot(
  {
   pattern: 'forward ?(.*)',
   fromMe: false,
-  desc: 'Forwards the replied message (any type)',
+  desc: 'Forward Message.',
   type: 'whatsapp',
  },
  async (message, match, m) => {
   if (!m.quoted) return await message.reply('Reply to a message to forward');
   let jids = parsedJid(match);
   let quotedMsg = m;
-  for (const jid of jids) await message.forward(jid, m.quoted.message, { quoted: quotedMsg });
+  for (const jid of jids) await message.fdMSg(jid, m.quoted.message, { quoted: quotedMsg });
+  return await message.sendReply('_Forwarded to ' + match + '_');
+ }
+);
+
+bot(
+ {
+  pattern: 'fullforward ?(.*)',
+  fromMe: false,
+  desc: 'Forwards the replied message (any type)',
+  type: 'whatsapp',
+ },
+ async (message, match, m) => {
+  if (!m.quoted) return await message.reply('Reply to a message to forward');
+  let jids = parsedJid(match);
+  for (const jid of jids) await message.forward(jid, m.quoted);
   return await message.sendReply('_Forwarded to ' + match + '_');
  }
 );
