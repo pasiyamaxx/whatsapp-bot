@@ -139,7 +139,7 @@ bot(
  },
  async (message, match, m, client) => {
   if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.sendReply('_Reply Status_');
-  return await message.forward(message.user, m.quoted);
+  return await message.fdMsg(message.user, m.quoted);
  }
 );
 
