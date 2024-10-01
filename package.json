@@ -46,7 +46,8 @@
   "simple-git": "^3.24.0",
   "sqlite3": "^5.1.7",
   "stream-buffers": "^3.0.2",
-  "tough-cookie": "^5.0.0"
+  "tough-cookie": "^5.0.0",
+  "unzipper": "*"
  },
  "devDependencies": {
   "prettier": "^3.3.3"
