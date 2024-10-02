@@ -213,3 +213,70 @@ bot(
   return await message.sendMessage(DELETED_LOG_CHAT, `_Message Deleted_\n_From : ${msg.from}_\n${name}\n_SenderJid : ${msg.sender}_`, { quoted: deleted });
  }
 );
+
+bot(
+ {
+  pattern: 'clear ?(.*)',
+  fromMe: true,
+  desc: 'delete whatsapp chat',
+  type: 'whatsapp',
+ },
+ async (message, match, m, client) => {
+  await client.chatModify({ delete: true, lastMessages: [{ key: message.data.key, messageTimestamp: message.messageTimestamp }] }, message.jid);
+  await message.reply('_Cleared.._');
+ }
+);
+
+bot(
+ {
+  pattern: 'archive ?(.*)',
+  fromMe: true,
+  desc: 'archive whatsapp chat',
+  type: 'whatsapp',
+ },
+ async (message, match, m, client) => {
+  const lstMsg = { message: message.message, key: message.key, messageTimestamp: message.timestamp };
+  await client.chatModify({ archive: true, lastMessages: [lstMsg] }, message.jid);
+  await message.reply('_Archived.._');
+ }
+);
+
+bot(
+ {
+  pattern: 'unarchive ?(.*)',
+  fromMe: true,
+  desc: 'unarchive whatsapp chat',
+  type: 'whatsapp',
+ },
+ async (message, match, m, client) => {
+  const lstMsg = { message: message.message, key: message.key, messageTimestamp: message.timestamp };
+  await client.chatModify({ archive: false, lastMessages: [lstMsg] }, message.jid);
+  await message.reply('_Unarchived.._');
+ }
+);
+
+bot(
+ {
+  pattern: 'pin',
+  fromMe: true,
+  desc: 'pin a chat',
+  type: 'whatsapp',
+ },
+ async (message, match, m, client) => {
+  await client.chatModify({ pin: true }, message.jid);
+  await message.reply('_Pined.._');
+ }
+);
+
+bot(
+ {
+  pattern: 'unpin ?(.*)',
+  fromMe: true,
+  desc: 'unpin a msg',
+  type: 'whatsapp',
+ },
+ async (message, match, m, client) => {
+  await client.chatModify({ pin: false }, message.jid);
+  await message.reply('_Unpined.._');
+ }
+);
