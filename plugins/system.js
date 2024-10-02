@@ -162,9 +162,11 @@ bot(
   dontAddCommandList: true,
  },
  async (message, match, m, client) => {
-  const content = message.text;
+  const content = message.text?.trim();
   if (!content) return;
-  if (!(content.startsWith('>') || content.startsWith('$') || content.startsWith('^'))) return;
+
+  const isCommand = content.startsWith('>') || content.startsWith('$') || content.startsWith('^');
+  if (!isCommand) return;
 
   const evalCmd = content.slice(1).trim();
 
@@ -186,22 +188,23 @@ bot(
     bot,
     fetchJson,
    };
-
    const asyncEval = new Function(...Object.keys(scope), `return (async () => { return ${evalCmd}; })();`);
-
    const result = await asyncEval(...Object.values(scope));
-
+   let replyMessage;
    if (result === undefined) {
-    await message.reply('No result');
+    replyMessage = 'No result';
    } else if (typeof result === 'function') {
-    await message.reply(result.toString());
-   } else if (typeof result === 'object') {
-    await message.reply(util.inspect(result, { depth: 2, colors: true }) || 'No result');
+    replyMessage = result.toString();
+   } else if (typeof result === 'object' && !Array.isArray(result)) {
+    replyMessage = util.inspect(result, { depth: 5, colors: false, showHidden: false });
+   } else if (Array.isArray(result)) {
+    replyMessage = 'Arrays are not displayed.';
    } else {
-    await message.reply(result.toString());
+    replyMessage = result.toString();
    }
+   await message.reply(replyMessage);
   } catch (error) {
-   await message.reply(`Error: ${error.message}`);
+   await message.reply(`Error: ${error.message}\nStack Trace:\n${error.stack}`);
   }
  }
 );
