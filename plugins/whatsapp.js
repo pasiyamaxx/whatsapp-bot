@@ -126,7 +126,7 @@ bot(
   if (!msg) return await message.reply('_Message not found maybe bot might not be running at that time_');
   msg = await serialize(JSON.parse(JSON.stringify(msg.message)), message.client);
   if (!msg.quoted) return await message.reply('No quoted message found');
-  await message.forward(message.jid, msg.quoted.message);
+  await message.fdMSg(message.jid, msg.quoted.message);
  }
 );
 
