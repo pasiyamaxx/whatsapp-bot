@@ -134,3 +134,4 @@ database.db
 session
 /auth
 bot.db
+auth
