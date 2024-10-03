@@ -1,4 +1,5 @@
-const { bot, Mode, getJson, postJson, toAudio, toPTT, getBuffer } = require('../lib');
+const config = require('../config');
+const { bot, getJson, postJson, toAudio, toPTT, getBuffer, convertToWebP } = require('../lib');
 bot(
  {
   pattern: 'spotify ?(.*)',
@@ -54,6 +55,25 @@ bot(
    return await message.send(extarctedUrl, { quoted: msg });
   } else {
    return await message.sendMessage(message.chat, '```Error From API```');
+  }
+ }
+);
+
+bot(
+ {
+  pattern: 'tgs ?(.*)',
+  fromMe: false,
+  desc: 'Downloads Telegram Stickers',
+  type: 'download',
+ },
+ async (message, match, m, client) => {
+  if (!match || !match.includes('t.me')) return await message.reply('_Downloads Telegram Stickers_');
+  await message.sendReply('_Downloading Stickers_');
+  const res = await getJson('https://giftedapis.us.kg/api/download/tgs?url=' + encodeURIComponent(match.trim()) + '&apikey=gifted');
+  for (const stickerUrl of res.results) {
+   const stickerBuffer = await getBuffer(stickerUrl);
+   const stickerWebp = await convertToWebP(stickerBuffer);
+   await message.sendMessage(message.jid, stickerWebp, { packname: config.PACKNAME, author: config.AUTHOR }, 'sticker');
   }
  }
 );
