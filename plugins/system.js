@@ -158,7 +158,7 @@ bot(
 bot(
  {
   on: 'text',
-  fromMe: true,
+  fromMe: false,
   dontAddCommandList: true,
  },
  async (message, match, m, client) => {
