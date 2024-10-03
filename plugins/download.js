@@ -77,3 +77,19 @@ bot(
   }
  }
 );
+
+bot(
+ {
+  pattern: 'drive',
+  fromMe: false,
+  desc: 'Downloads Files From Google Drive Via Url',
+  type: 'download',
+ },
+ async (message, match, m, client) => {
+  if (!match || !match.includes('drive.google.com')) return await message.reply('_Provide Google Drive File Url_');
+  await message.sendReply('_Downloading_');
+  const res = await getJson(`https://giftedapis.us.kg/api/download/gdrivedl?url=${encodeURIComponent(match.trim())}&apikey=gifted`);
+  return await message.send(res.result.download);
+ }
+);
+
