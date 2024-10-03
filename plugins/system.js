@@ -204,7 +204,7 @@ bot(
    }
    await message.reply(replyMessage);
   } catch (error) {
-   await message.reply(`Error: ${error.message}\nStack Trace:\n${error.stack}`);
+   await message.reply(`> *Error: ${error.message}*`);
   }
  }
 );

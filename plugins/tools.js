@@ -1,4 +1,4 @@
-const { bot, Mode, qrcode, isUrl, Bitly, removeBg, tinyurl, ssweb, shortenurl, upload, IronMan, ffmpeg, parseTimeToSeconds, convertInputsToPDF } = require('../lib');
+const { bot, Mode, qrcode, isUrl, Bitly, removeBg, tinyurl, ssweb, shortenurl, upload, IronMan, ffmpeg, parseTimeToSeconds, convertInputsToPDF, getJson } = require('../lib');
 const config = require('../config');
 const { fromBuffer } = require('file-type');
 const { MessageType } = require('baileys');
@@ -175,10 +175,15 @@ bot(
   desc: 'wame generator',
   type: 'tools',
  },
- async (message, match) => {
-  if (!message.quoted) return message.reply('_*Reply to a user*_');
-  let sender = 'https://wa.me/' + (message.reply_message.sender || message.mention[0] || message.text).split('@')[0];
-  await message.reply(sender);
+ async (message, match, m, client) => {
+  const quotedMessage = message.reply_message?.sender || message.mention?.[0];
+
+  if (!quotedMessage) return await message.send('_*Reply to a user*_');
+
+  const senderNumber = quotedMessage.split('@')[0];
+  const wameLink = 'https://wa.me/' + senderNumber;
+
+  return await message.send(wameLink);
  }
 );
 
@@ -202,5 +207,20 @@ bot(
   } else {
    await message.sendMessage(message.jid, '_Provide text or quote an image to convert to PDF._');
   }
+ }
+);
+
+bot(
+ {
+  pattern: 'obfuscate',
+  fromMe: false,
+  desc: 'Obfuscates Javascript to Non-human-readable ',
+  type: 'download',
+ },
+ async (message, match, m, client) => {
+  const reqCode = match || message.reply_message?.text || m.quoted?.text;
+  if (!reqCode) return await message.send('_Provide or Reply to a Message with JS Code_');
+  const response = await getJson('https://giftedapis.us.kg/api/tools/encrypt?code=' + encodeURIComponent(reqCode) + '&apikey=gifted');
+  return await message.send(response.encrypted_code);
  }
 );
