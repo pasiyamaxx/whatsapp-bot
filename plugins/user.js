@@ -1,5 +1,5 @@
-const { bot, parsedJid, saveWarn, resetWarn, getFilter, setFilter, deleteFilter } = require('../lib');
-const { PausedChats } = require('../lib/Store');
+const { bot, parsedJid, saveWarn, resetWarn, getFilter, setFilter, deleteFilter } = require('../utils');
+const { PausedChats } = require('../utils/Store');
 const { WARN_COUNT } = require('../config');
 bot(
  {

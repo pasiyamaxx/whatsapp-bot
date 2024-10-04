@@ -1,4 +1,4 @@
-const { bot, Mode, serialize, loadMessage, parsedJid, getName } = require('../lib');
+const { bot, Mode, serialize, loadMessage, parsedJid, getName } = require('../utils');
 const { DELETED_LOG_CHAT, DELETED_LOG } = require('../config');
 
 bot(

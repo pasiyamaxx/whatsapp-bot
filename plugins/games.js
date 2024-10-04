@@ -1,4 +1,4 @@
-const { bot, Mode, XKCDComic, getJson } = require('../lib');
+const { bot, Mode, XKCDComic, getJson } = require('../utils');
 const axios = require('axios');
 
 let triviaGames = {};

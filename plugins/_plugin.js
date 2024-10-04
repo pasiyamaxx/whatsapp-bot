@@ -1,4 +1,4 @@
-const { bot, PluginDB, installPlugin } = require('../lib');
+const { bot, PluginDB, installPlugin } = require('../utils');
 const axios = require('axios');
 const fs = require('fs');
 

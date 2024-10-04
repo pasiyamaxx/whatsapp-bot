@@ -1,5 +1,5 @@
 const config = require('../config');
-const { bot, getJson, postJson, toAudio, toPTT, getBuffer, convertToWebP } = require('../lib');
+const { bot, getJson, postJson, toAudio, toPTT, getBuffer, convertToWebP } = require('../utils');
 bot(
  {
   pattern: 'spotify ?(.*)',

@@ -1,4 +1,4 @@
-const { bot } = require('../lib');
+const { bot } = require('../utils');
 
 class AFKManager {
  constructor() {

@@ -1,4 +1,4 @@
-const { bot, Mode } = require('../lib');
+const { bot, Mode } = require('../utils');
 
 bot(
  {

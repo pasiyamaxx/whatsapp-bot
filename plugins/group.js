@@ -1,4 +1,4 @@
-const { bot, Mode, isAdmin, parsedJid, setMessage, getMessage, delMessage, getStatus, toggleStatus, banUser, unbanUser, isBanned } = require('../lib');
+const { bot, Mode, isAdmin, parsedJid, setMessage, getMessage, delMessage, getStatus, toggleStatus, banUser, unbanUser, isBanned } = require('../utils');
 bot(
  {
   on: 'message',

@@ -1,6 +1,6 @@
 const os = require('os');
 const util = require('util');
-const { bot, Mode, runtime, commands, getJson, getBuffer } = require('../lib');
+const { bot, Mode, runtime, commands, getJson, getBuffer } = require('../utils');
 const { TIME_ZONE } = require('../config');
 const { exec } = require('child_process');
 const fetchJson = getJson;
