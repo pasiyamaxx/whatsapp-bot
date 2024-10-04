@@ -103,7 +103,7 @@ bot(
 
 bot(
  {
-  pattern: 'reboot',
+  pattern: 'restart',
   fromMe: true,
   info: 'Restarts the Bot',
   type: 'system',
@@ -139,7 +139,7 @@ bot(
   const msg = await message.reply('');
   const end = new Date().getTime();
   const responseTime = (end - start) / 1000;
-  await msg.edit(`ʟᴀᴛᴇɴᴄʏ: ${responseTime} sᴇᴄs`);
+  await msg.edit(`*ʟᴀᴛᴇɴᴄʏ: ${responseTime} sᴇᴄs*`);
  },
 );
 
