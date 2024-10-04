@@ -11,7 +11,7 @@ async function initialize() {
  await config.DATABASE.sync();
  await requireJS(path.join(__dirname, '/plugins/'));
  await getandRequirePlugins();
- return connect();
+ return await connect();
 }
 
 app.listen(PORT, async () => {
