@@ -8,7 +8,7 @@ bot(
   pattern: 'trivia',
   fromMe: false,
   desc: 'Start a trivia game.',
-  type: 'game',
+  type: 'games',
  },
  async (message, match, m) => {
   const userId = message.sender;
@@ -27,7 +27,7 @@ bot(
   };
 
   return sendTriviaQuestion(message, userId);
- }
+ },
 );
 
 bot(
@@ -62,7 +62,7 @@ bot(
     }
    }
   }
- }
+ },
 );
 
 function isOptionNumber(answer) {
@@ -109,38 +109,12 @@ async function endTriviaGame(message, userId) {
  delete triviaGames[userId];
 }
 
-/**
- *
- */
-bot(
- {
-  pattern: 'xkcd',
-  fromMe: false,
-  desc: 'Send a random XKCD comic.',
-  type: 'misc',
- },
- async (message, match, m) => {
-  try {
-   const result = await XKCDComic();
-   message.sendMessage(message.jid, result.imageUrl, { quoted: message.data }, 'image');
-  } catch (error) {
-   console.error('Error:', error.message);
-   message.reply('Error fetching XKCD comic.');
-  }
- }
-);
-
-/**
- *
- *
- */
-
 bot(
  {
   pattern: 'joke',
   fromMe: false,
   desc: 'Fetch a random joke',
-  dontAddCommandList: false,
+  type: 'games',
  },
  async (message, match) => {
   try {
@@ -164,5 +138,5 @@ bot(
    console.error('Error fetching joke:', error);
    message.reply('Failed to fetch a joke. Please try again later.');
   }
- }
+ },
 );

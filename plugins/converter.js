@@ -51,7 +51,7 @@ bot(
   pattern: 'mp3',
   fromMe: false,
   desc: 'Converts video/voice to mp3',
-  type: 'downloader',
+  type: 'converter',
  },
  async (message, match, m) => {
   let buff = await m.quoted.download();
@@ -65,7 +65,7 @@ bot(
   pattern: 'mp4',
   fromMe: false,
   desc: 'converts video/voice to mp4',
-  type: 'downloader',
+  type: 'converter',
  },
  async (message, match, m) => {
   if (!message.reply_message.video || !message.reply_message.sticker || !message.reply_message.audio) return await message.reply('_Reply to a sticker/audio/video_');
