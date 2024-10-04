@@ -68,7 +68,7 @@ bot(
     menuText += `\n╭── ${category} ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`;
    });
 
-  return await message.sendMessage(jid, '```' + menuText.trim() + '```');
+  return await message.send(menuText);
  }
 );
 
