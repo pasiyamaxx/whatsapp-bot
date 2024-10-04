@@ -4,7 +4,7 @@ const config = require('./config');
 const { connect } = require('./lib');
 const { requireJS } = require('./utils')
 const { getandRequirePlugins } = require('./database').Plugins
-const SessionManager = require('./client/session_manager')
+const { SessionManager } = require('./client')
 const app = express();
 const PORT = process.env.PORT || '8000';
 async function makeSession() {
