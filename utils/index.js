@@ -1,6 +1,5 @@
 const fs = require('fs').promises;
 const axios = require('axios');
-const got = require('got');
 const path = require('path');
 const cheerio = require('cheerio');
 const tough = require('tough-cookie');
@@ -14,11 +13,8 @@ const PDFDocument = require('pdfkit');
 let { JSDOM } = require('jsdom');
 const { Buffer } = require('buffer');
 const { writeFileSync, readFileSync, unlinkSync, existsSync } = require('fs');
-const { SESSION_ID } = require('../../config');
-const PastebinAPI = require('pastebin-js');
-const sessPath = path.resolve(__dirname, '../../auth');
-const pastebin = new PastebinAPI('bR1GcMw175fegaIFV2PfignYVtF0b_Bl');
 const Crypto = require('crypto');
+const sharp = require('sharp');
 const webp = require('node-webpmux');
 const { tmpdir } = require('os');
 const { fromBuffer } = require('file-type');
@@ -921,8 +917,20 @@ function replaceMessagePlaceholders(message, user, metadata) {
   .replace(/@gname/gi, metadata.subject)
   .replace(/@count/gi, metadata.participants.length);
 }
-
+/**
+ * Converts an image (path or buffer) to WebP format.
+ * @param {string|Buffer} input - Path to the image or image buffer.
+ * @param {string} [outputPath] - Optional path to save the converted WebP image.
+ * @returns {Promise<Buffer>} - The WebP buffer.
+ */
+async function convertToWebP(input, outputPath = null) {
+ let image = typeof input === 'string' ? sharp(input) : sharp(input);
+ const webpBuffer = await image.toFormat('webp').toBuffer();
+ if (outputPath) writeFileSync(outputPath, webpBuffer);
+ return webpBuffer;
+}
 module.exports = {
+  convertToWebP,
  Greetings,
  bot,
  commands,
