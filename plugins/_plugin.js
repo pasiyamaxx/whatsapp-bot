@@ -19,7 +19,7 @@ bot(
   require(`./${plugin_name}`);
   await installPlugin(url, plugin_name);
   message.send(`_Installed: ${plugin_name}_`);
- }
+ },
 );
 
 bot(
@@ -33,7 +33,7 @@ bot(
   const plugins = await PluginDB.findAll();
   if (plugins.length < 1) return message.send('_External Plugins Not Found_');
   message.send(plugins.map((p) => `\`\`\`${p.dataValues.name}\`\`\`: ${p.dataValues.url}`).join('\n'));
- }
+ },
 );
 
 bot(
@@ -51,5 +51,5 @@ bot(
   delete require.cache[require.resolve(`./${match}.js`)];
   fs.unlinkSync(`${__dirname}/${match}.js`);
   message.sendMessage(`Plugin ${match} deleted`);
- }
+ },
 );

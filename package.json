@@ -1,18 +1,12 @@
 {
  "name": "fxop-md",
- "version": "1.0.4",
- "description": "Whatsapp Bot",
+ "version": "1.0.5",
+ "description": "Simple WhatsApp Bot",
  "main": "index.js",
- "directories": {
-  "lib": "lib"
- },
  "author": "AstroX10",
- "license": "MIT",
  "scripts": {
   "start": "pm2 start . --attach --name fx-md",
-  "stop": "pm2 stop fx-md",
-  "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-  "test": "node test.js"
+  "stop": "pm2 stop fx-md"
  },
  "dependencies": {
   "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -51,8 +45,5 @@
   "stream-buffers": "^3.0.2",
   "tough-cookie": "^5.0.0",
   "unzipper": "^0.12.3"
- },
- "devDependencies": {
-  "prettier": "^3.3.3"
  }
 }
