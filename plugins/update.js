@@ -30,5 +30,5 @@ bot(
    commits.all.forEach((commit, i) => (changes += `${i + 1}. ${commit.message}\n`));
    await message.sendMessage(message.jid, changes + `\n*To update, send* ${message.prefix}update now`);
   }
- }
+ },
 );

@@ -38,7 +38,7 @@ bot(
   const currentTime = new Date().toLocaleTimeString('en-IN', { timeZone: TIME_ZONE });
   const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const currentDate = new Date().toLocaleDateString('en-IN', { timeZone: TIME_ZONE });
-  let menuText = (`╭─ ғxᴏᴘʀɪsᴀ ᴍᴅ ───
+  let menuText = `\`\`\`╭─ ғxᴏᴘʀɪsᴀ ᴍᴅ ───
 │ Prefix: ${prefix}
 │ User: ${pushName}
 │ Os: ${getOS()}
@@ -49,7 +49,7 @@ bot(
 │ Day: ${currentDay}
 │ Date: ${currentDate}
 │ Version: ${require('../package.json').version}
-╰────────────────\n`).toLocaleLowerCase();
+╰────────────────\`\`\`\n`;
 
   const categorized = commands
    .filter((cmd) => cmd.pattern && !cmd.dontAddCommandList)
@@ -65,11 +65,11 @@ bot(
   Object.keys(categorized)
    .sort()
    .forEach((category) => {
-    menuText += `\n╭── *${category}* ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`;
+    menuText += tiny(`\n╭── *${category}* ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`);
    });
 
-  return await message.send(tiny(menuText));
- }
+  return await message.send(menuText);
+ },
 );
 
 bot(
@@ -79,7 +79,7 @@ bot(
   description: 'Show All Commands',
   dontAddCommandList: true,
  },
- async (message, query, { prefix }) => {
+ async (message) => {
   let commandListText = '\t\t```Command List```\n';
   const commandList = [];
 
@@ -98,7 +98,7 @@ bot(
   });
 
   return await message.sendMessage(message.jid, commandListText.trim());
- }
+ },
 );
 
 bot(
@@ -111,7 +111,7 @@ bot(
  async (message, match, m, client) => {
   await message.sendReply('_Restarting..._');
   await process.exit(1);
- }
+ },
 );
 
 bot(
@@ -124,7 +124,7 @@ bot(
  async (m) => {
   await m.sendReply('_Shutting Down_');
   await exec(require('../package.json').scripts.stop);
- }
+ },
 );
 
 bot(
@@ -140,7 +140,7 @@ bot(
   const end = new Date().getTime();
   const responseTime = (end - start) / 1000;
   await msg.edit(`ʟᴀᴛᴇɴᴄʏ: ${responseTime} sᴇᴄs`);
- }
+ },
 );
 
 bot(
@@ -152,7 +152,7 @@ bot(
  },
  async (message, match) => {
   message.send(`*Uptime:* ${runtime(process.uptime())}`);
- }
+ },
 );
 
 bot(
@@ -206,5 +206,5 @@ bot(
   } catch (error) {
    await message.reply(`> *Error: ${error.message}*`);
   }
- }
+ },
 );

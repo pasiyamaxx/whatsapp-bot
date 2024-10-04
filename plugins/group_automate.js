@@ -30,8 +30,6 @@ class AntilinkDB {
 }
 
 const antilinkDB = new AntilinkDB();
-
-// Define an async isAdmin function to check if a user is an admin
 const isAdmin = async (jid, message, client) => {
  try {
   const metadata = await client.groupMetadata(message.jid);
@@ -114,7 +112,7 @@ bot(
    default:
     await message.reply('Invalid command. Use: antilink on/off/delete/kick/warn/get/del');
   }
- }
+ },
 );
 
 bot(
@@ -125,7 +123,6 @@ bot(
  },
  async (message, match, m, client) => {
   if (!message.isGroup) return;
-
   const settings = antilinkDB.getAntilink(message.jid);
   if (!settings || !settings.active) return;
   if (!(await isAdmin(message.user, message, client))) return;
@@ -149,7 +146,6 @@ bot(
    } else if (settings.warn) {
     const warnCount = antilinkDB.incrementWarn(message.jid, message.participant);
     await message.reply(`@${message.participant.split('@')[0]}, sending links is not allowed. Warning ${warnCount}/3`, { mentions: [message.participant] });
-
     if (warnCount >= 3) {
      await client.groupParticipantsUpdate(message.jid, [message.participant], 'remove');
      await message.reply(`@${message.participant.split('@')[0]} has been removed for exceeding the warn limit.`, { mentions: [message.participant] });
@@ -158,5 +154,5 @@ bot(
     await message.reply(`@${message.participant.split('@')[0]}, sending links is not allowed in this group.`, { mentions: [message.participant] });
    }
   }
- }
+ },
 );
