@@ -1,5 +1,6 @@
 const config = require('../config');
 const { bot, getJson, postJson, toAudio, toPTT, getBuffer, convertToWebP } = require('../lib');
+const urlLib = require('url');
 bot(
  {
   pattern: 'spotify ?(.*)',
@@ -86,7 +87,10 @@ bot(
   type: 'download',
  },
  async (message, match, m, client) => {
-  if (!match || !match.includes('drive.google.com')) return await message.reply('_Provide Google Drive File Url_');
+  if (!match) return await message.reply('_Provide Google Drive File Url_');
+  const parsedUrl = urlLib.parse(match.trim());
+  const allowedHosts = ['drive.google.com'];
+  if (!allowedHosts.includes(parsedUrl.host)) return await message.reply('_Provide Google Drive File Url_');
   await message.sendReply('_Downloading_');
   const res = await getJson(`https://giftedapis.us.kg/api/download/gdrivedl?url=${encodeURIComponent(match.trim())}&apikey=gifted`);
   return await message.send(res.result.download);
