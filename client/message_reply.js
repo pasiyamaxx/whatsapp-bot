@@ -1,7 +1,7 @@
 const Base = require('./base');
 const fs = require('fs').promises;
 const fileType = require('file-type');
-const config = require('../../config');
+const config = require('../config');
 const { parsedJid } = require('../utils');
 const path = require('path');
 const os = require('os');

@@ -24,7 +24,7 @@ module.exports = {
  WORK_TYPE: process.env.WORK_TYPE || 'private',
  DATABASE_URL: DATABASE_URL,
  DATABASE:
-  DATABASE_URL === './bot.db'
+  DATABASE_URL === './database.db'
    ? new Sequelize({
       dialect: 'sqlite',
       storage: DATABASE_URL,

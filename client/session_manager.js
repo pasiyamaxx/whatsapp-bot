@@ -11,7 +11,7 @@ class SessionManager {
       throw new Error('Session ID is empty');
     }
     this.zipPath = join(__dirname, `session_${this.id}.zip`);
-    this.dirPath = join(__dirname, './session');
+    this.dirPath = join(__dirname, '../session');
   }
 
   async createSession() {

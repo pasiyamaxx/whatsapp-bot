@@ -1,5 +1,5 @@
 const Base = require('./base');
-const config = require('../../config');
+const config = require('../config');
 const ReplyMessage = require('./message_reply');
 const { decodeJid, createInteractiveMessage, parsedJid, writeExifWebp, isUrl } = require('../utils');
 const { generateWAMessageFromContent, generateWAMessage, generateForwardMessageContent, getContentType } = require('baileys');
