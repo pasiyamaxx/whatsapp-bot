@@ -44,4 +44,4 @@ class SessionManager {
   }
 }
 
-module.exports=SessionManager
+module.exports = SessionManager
