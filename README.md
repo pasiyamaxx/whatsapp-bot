@@ -34,9 +34,6 @@ This project utilizes a custom server designed for efficient management of authe
 | AUTO_STATUS_READ | make it true if you want bot to view status      |
 | SUDO             | owner number(91234567899,92336829223,9474839234) |
 
-Sure! Here’s a brief statement you can use to inform users that your project is under the MIT License:
-
----
 
 ## License
 
