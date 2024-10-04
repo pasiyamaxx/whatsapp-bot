@@ -5,23 +5,34 @@ class AFKManager {
   this.isAfk = false;
   this.reason = null;
   this.lastSeen = 0;
+  this.respondedUsers = new Set();
  }
 
  setAFK(reason = null) {
   this.isAfk = true;
   this.reason = reason;
   this.lastSeen = Math.floor(Date.now() / 1000);
+  this.respondedUsers.clear();
  }
 
  clearAFK() {
   this.isAfk = false;
   this.reason = null;
   this.lastSeen = 0;
+  this.respondedUsers.clear();
  }
 
  getAFKMessage() {
   const timePassed = this.lastSeen ? this.secondsToHms(Math.floor(Date.now() / 1000) - this.lastSeen) : '';
   return `I'm currently away from keyboard.${this.reason ? `\n*Reason:* \`\`\`${this.reason}\`\`\`` : ''}${timePassed ? `\n*Last Seen:* \`\`\`${timePassed} ago\`\`\`` : ''}`;
+ }
+
+ shouldRespond(jid) {
+  if (!this.respondedUsers.has(jid)) {
+   this.respondedUsers.add(jid);
+   return true;
+  }
+  return false;
  }
 
  secondsToHms(seconds) {
@@ -47,14 +58,16 @@ bot(
  async (message, match) => {
   if (!afkManager.isAfk) return;
 
-  const isRelevantMessage = !message.jid.includes('@g.us') || (message.mention && message.mention.length > 0) || message.reply_message;
+  const isGroup = message.jid.includes('@g.us');
+  const isMentioned = message.mention && message.mention.includes(message.client.user.id.split('@')[0]);
+  const isReply = message.reply_message && message.reply_message.participant === message.client.user.id;
 
-  if (!isRelevantMessage) return;
-
-  const shouldRespond = (message.mention && message.mention.includes(message.client.user.jid.split('@')[0])) || (message.reply_message && message.reply_message.jid.split('@')[0] === message.client.user.jid.split('@')[0]);
-
-  if (shouldRespond) {
-   await message.send(afkManager.getAFKMessage(), { quoted: message.data });
+  if (!isGroup || isMentioned || isReply) {
+   const respondToJid = isGroup ? message.participant : message.jid;
+   if (afkManager.shouldRespond(respondToJid)) {
+    console.log(`Sending AFK message to ${respondToJid}`);
+    await message.reply(afkManager.getAFKMessage());
+   }
   }
  }
 );
@@ -65,9 +78,9 @@ bot(
   fromMe: true,
  },
  async (message, match) => {
-  if (afkManager.isAfk && !message.id.startsWith('3EB0')) {
+  if (afkManager.isAfk && !message.id.startsWith('3EB0') && message.fromMe) {
    afkManager.clearAFK();
-   await message.send("I'm no longer away from keyboard.");
+   await message.send("```Afk Off, I'm Online Now```");
   }
  }
 );
@@ -81,7 +94,7 @@ bot(
  async (message, match) => {
   if (!afkManager.isAfk) {
    afkManager.setAFK(match || null);
-   await message.send(`I'm now away from keyboard.${afkManager.reason ? `\n*Reason:* \`\`\`${afkManager.reason}\`\`\`` : ''}`);
+   await message.send(`\`\`\`Afk Activated!\`\`\``);
   }
  }
 );
