@@ -1,6 +1,6 @@
 const os = require('os');
 const util = require('util');
-const { bot, Mode, runtime, commands, getJson, getBuffer } = require('../utils');
+const { bot, tiny, runtime, commands, getJson, getBuffer } = require('../utils');
 const { TIME_ZONE } = require('../config');
 const { exec } = require('child_process');
 const fetchJson = getJson;
@@ -38,7 +38,7 @@ bot(
   const currentTime = new Date().toLocaleTimeString('en-IN', { timeZone: TIME_ZONE });
   const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const currentDate = new Date().toLocaleDateString('en-IN', { timeZone: TIME_ZONE });
-  let menuText = `╭─ ғxᴏᴘʀɪsᴀ ᴍᴅ ───
+  let menuText = (`╭─ ғxᴏᴘʀɪsᴀ ᴍᴅ ───
 │ Prefix: ${prefix}
 │ User: ${pushName}
 │ Os: ${getOS()}
@@ -49,7 +49,7 @@ bot(
 │ Day: ${currentDay}
 │ Date: ${currentDate}
 │ Version: ${require('../package.json').version}
-╰────────────────\n`;
+╰────────────────\n`).toLocaleLowerCase();
 
   const categorized = commands
    .filter((cmd) => cmd.pattern && !cmd.dontAddCommandList)
@@ -65,10 +65,10 @@ bot(
   Object.keys(categorized)
    .sort()
    .forEach((category) => {
-    menuText += `\n╭── ${category} ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`;
+    menuText += `\n╭── *${category}* ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`;
    });
 
-  return await message.send(menuText);
+  return await message.send(tiny(menuText));
  }
 );
 
