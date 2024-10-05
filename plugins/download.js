@@ -1,5 +1,5 @@
 const config = require('../config');
-const { bot, getJson, postJson, toAudio, toPTT, getBuffer, convertToWebP, twitter } = require('../utils');
+const { bot, getJson, postJson, toAudio, toPTT, getBuffer, convertToWebP, twitter, pinterest } = require('../utils');
 bot(
  {
   pattern: 'spotify ?(.*)',
@@ -105,5 +105,21 @@ bot(
   await message.sendReply('_Downloading Video_');
   const res = await twitter(match);
   return await message.send(res);
+ }
+);
+
+bot(
+ {
+  pattern: 'pinterest',
+  fromMe: false,
+  desc: 'Search & Download Pinterest Images',
+  type: 'download',
+ },
+ async (message, match) => {
+  if (!match) return message.reply('_Provide Search Query!_');
+  const res = await pinterest(match);
+  for (const images of res) {
+   await message.send(images);
+  }
  }
 );
