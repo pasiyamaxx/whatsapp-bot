@@ -1,5 +1,6 @@
 const { Buffer } = require('buffer');
 const { writeFileSync, readFileSync, unlinkSync } = require('fs');
+const path = require('path')
 const Crypto = require('crypto');
 const webp = require('node-webpmux');
 const { tmpdir } = require('os');

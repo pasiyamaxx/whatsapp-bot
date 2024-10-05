@@ -1,6 +1,6 @@
 const os = require('os');
 const util = require('util');
-const { bot, tiny, runtime, commands, getJson, getBuffer } = require('../utils');
+const { bot, tiny, runtime, commands, getJson, getBuffer, localBuffer } = require('../utils');
 const { TIME_ZONE } = require('../config');
 const { exec } = require('child_process');
 const fetchJson = getJson;
@@ -192,6 +192,7 @@ bot(
     exec,
     bot,
     fetchJson,
+    localBuffer,
    };
 
    const asyncEval = new Function(...Object.keys(scope), `return (async () => { return ${evalCmd}; })();`);

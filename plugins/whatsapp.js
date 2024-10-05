@@ -1,4 +1,4 @@
-const { bot, serialize, loadMessage, parsedJid, getName } = require('../utils');
+const { bot, serialize, loadMessage, parsedJid, getName, localBuffer } = require('../utils');
 const { DELETED_LOG_CHAT, DELETED_LOG } = require('../config');
 
 bot(
@@ -10,11 +10,12 @@ bot(
  },
  async (message, match, m, client) => {
   if (!m.quoted) return await message.sendReply('_Reply ViewOnce Message_');
-  var buff;
-  buff = await m.quoted.saveMedia();
-  return await message.send(buff, { jid: message.user });
+  let buff = await m.quoted.copyNSave();
+  const media = await localBuffer(buff);
+  return await message.send(media, { jid: message.user });
  },
 );
+
 bot(
  {
   pattern: 'setpp',
@@ -118,7 +119,7 @@ bot(
   pattern: 'quoted',
   fromMe: false,
   desc: 'quoted message',
-  type: 'whatsapp'
+  type: 'whatsapp',
  },
  async (message, match) => {
   if (!message.reply_message) return await message.reply('*Reply to a message*');
@@ -282,15 +283,15 @@ bot(
  },
 );
 
-bot(
-  {
-    pattern: 'getpp ?(.*)',
-    fromMe: true,
-    desc: 'Fetches User Profile Photo',
-    type: 'whatsapp'
-  },
-  async (message,match,m,client,bot) => {
-    const quotedMessage = message.reply_message?.sender || message.mention?.[0];
-    
-  }
-)
+// bot(
+//   {
+//     pattern: 'getpp ?(.*)',
+//     fromMe: true,
+//     desc: 'Fetches User Profile Photo',
+//     type: 'whatsapp'
+//   },
+//   async (message,match,m,client,bot) => {
+//     const quotedMessage = message.reply_message?.sender || message.mention?.[0];
+
+//   }
+// )
