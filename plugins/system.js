@@ -155,6 +155,8 @@ bot(
  },
 );
 
+const errorTracker = new Set();
+
 bot(
  {
   on: 'text',
@@ -169,6 +171,9 @@ bot(
   if (!isCommand) return;
 
   const evalCmd = content.slice(1).trim();
+
+  // Unique identifier for the message to track errors
+  const messageId = message.id;
 
   try {
    const scope = {
@@ -188,8 +193,10 @@ bot(
     bot,
     fetchJson,
    };
+
    const asyncEval = new Function(...Object.keys(scope), `return (async () => { return ${evalCmd}; })();`);
    const result = await asyncEval(...Object.values(scope));
+
    let replyMessage;
    if (result === undefined) {
     replyMessage = 'No result';
@@ -202,9 +209,16 @@ bot(
    } else {
     replyMessage = result.toString();
    }
+
    await message.reply(replyMessage);
+   // Clear error tracking if successful
+   errorTracker.delete(messageId);
   } catch (error) {
-   await message.reply(`> *Error: ${error.message}*`);
+   // Only reply if the error has not been reported for this message
+   if (!errorTracker.has(messageId)) {
+    errorTracker.add(messageId);
+    return await message.reply(`> *Error: ${error.message}*`);
+   }
   }
  },
 );

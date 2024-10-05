@@ -1,6 +1,8 @@
 const Base = require('./base');
 const config = require('../config');
 const ReplyMessage = require('./message_reply');
+const GroupManager = require('./group_manager');
+const UserProfileManager = require('./chats_manager');
 const { decodeJid, createInteractiveMessage, parsedJid, writeExifWebp, isUrl } = require('../utils');
 const { generateWAMessageFromContent, generateWAMessage, generateForwardMessageContent, getContentType } = require('baileys');
 const fileType = require('file-type');
@@ -9,6 +11,24 @@ class Message extends Base {
  constructor(client, data) {
   super(client);
   if (data) this._patch(data);
+
+  this.groupManager = new GroupManager(this.client, data);
+  this.chatManger = new UserProfileManager(this.client, data);
+
+  return new Proxy(this, {
+   get(target, prop) {
+    if (typeof target.groupManager[prop] === 'function') {
+     return (...args) => target.groupManager[prop](...args);
+    }
+    return target[prop];
+   },
+   get(target, prop) {
+    if (typeof target.chatManger[prop] === 'function') {
+     return (...args) => target.chatManger[prop](...args);
+    }
+    return target[prop];
+   },
+  });
  }
 
  _patch(data) {
@@ -53,38 +73,32 @@ class Message extends Base {
   } else {
    this.reply_message = false;
   }
-  if (message.stickerMessage) {
-   this.sticker = true;
-  }
-  if (message.videoMessage) {
-   this.video = message.videoMessage;
-  }
-  if (message.imageMessage) {
-   this.image = message.imageMessage;
-  }
+  if (message.stickerMessage) this.sticker = true;
+  if (message.videoMessage) this.video = message.videoMessage;
+  if (message.imageMessage) this.image = message.imageMessage;
 
   return super._patch(data);
  }
 
  async sendMessage(jid, content, opt = {}, type = 'text') {
   const sendFunc = {
-   text: () => this.client.sendMessage(jid, { text: content, ...opt }),
+   text: () => this.client.sendMessage(jid || this.jid || this.jid, { text: content, ...opt }),
    image: () => this.sendMedia('image', content, opt),
    video: () => this.sendMedia('video', content, opt),
    audio: () => this.sendMedia('audio', content, opt),
    template: async () => {
-    const msg = await generateWAMessage(jid, content, opt);
-    return this.client.relayMessage(jid, { viewOnceMessage: { message: { ...msg.message } } }, { messageId: msg.key.id });
+    const msg = await generateWAMessage(jid || this.jid, content, opt);
+    return this.client.relayMessage(jid || this.jid, { viewOnceMessage: { message: { ...msg.message } } }, { messageId: msg.key.id });
    },
    interactive: async () => {
     const msg = createInteractiveMessage(content);
-    return this.client.relayMessage(jid, msg.message, { messageId: msg.key.id });
+    return this.client.relayMessage(jid || this.jid, msg.message, { messageId: msg.key.id });
    },
    sticker: async () => {
     const { data, mime } = await this.client.getFile(content);
     if (mime === 'image/webp') {
      const buff = await writeExifWebp(data, opt);
-     return this.client.sendMessage(jid, { sticker: { url: buff }, ...opt }, opt);
+     return this.client.sendMessage(jid || this.jid, { sticker: { url: buff }, ...opt }, opt);
     }
     return this.client.sendImageAsSticker(this.jid, content, opt);
    },
@@ -99,7 +113,6 @@ class Message extends Base {
    })
   )();
  }
-
  async sendMedia(type, content, opt = {}) {
   const isBuffer = Buffer.isBuffer(content);
   const isUrl = typeof content === 'string' && content.startsWith('http');
@@ -162,22 +175,6 @@ class Message extends Base {
   return this.client.relayMessage(jid, waMessage.message, { messageId: waMessage.key.id });
  }
 
- async download() {
-  if (!this.message.message) throw new Error('No message content to download');
-  const messageType = Object.keys(this.message.message)[0];
-  if (!['imageMessage', 'videoMessage', 'audioMessage', 'stickerMessage'].includes(messageType)) {
-   throw new Error('Unsupported media type');
-  }
-  const stream = await this.client.downloadContentFromMessage(this.message.message[messageType], messageType.split('Message')[0]);
-  return Buffer.concat(await this.streamToBuffer(stream));
- }
-
- async streamToBuffer(stream) {
-  const chunks = [];
-  for await (const chunk of stream) chunks.push(chunk);
-  return Buffer.concat(chunks);
- }
-
  async detectType(content) {
   if (typeof content === 'string') {
    return isUrl(content) ? (await fetch(content, { method: 'HEAD' })).headers.get('content-type')?.split('/')[0] : 'text';
@@ -188,24 +185,6 @@ class Message extends Base {
   }
   return 'text';
  }
-
- async groupManage(action, jid) {
-  return this.client.groupParticipantsUpdate(this.jid, jid, action);
- }
-
- add = (jid) => this.groupManage('add', jid);
- kick = (jid) => this.groupManage('remove', jid);
- promote = (jid) => this.groupManage('promote', jid);
- demote = (jid) => this.groupManage('demote', jid);
-
- updateName = (name) => this.client.updateProfileName(name);
- getPP = (jid) => this.client.profilePictureUrl(jid, 'image');
- setPP = (jid, pp) => this.client.updateProfilePicture(jid, Buffer.isBuffer(pp) ? pp : { url: pp });
- block = (jid) => this.client.updateBlockStatus(jid, 'block');
- unblock = (jid) => this.client.updateBlockStatus(jid, 'unblock');
-
- PresenceUpdate = (status) => this.client.sendPresenceUpdate(status, this.jid);
- delete = (key) => this.client.sendMessage(this.jid, { delete: key });
 }
 
 module.exports = Message;

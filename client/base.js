@@ -1,8 +1,10 @@
 'use strict';
+
 class Base {
  constructor(client, msg) {
-  Object.defineProperty(this, 'client', { value: client });
-  Object.defineProperty(this, 'm', { value: msg });
+  Object.defineProperty(this, 'client', { value: client, writable: false });
+  Object.defineProperty(this, 'bot', { value: this.client, writable: false });
+  Object.defineProperty(this, 'm', { value: msg, writable: false });
  }
 
  _clone() {

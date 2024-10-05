@@ -54,6 +54,12 @@ class ReplyMessage extends Base {
   await fs.writeFile(filePath, buff);
   return filePath;
  }
+ async downloadAndReturnBuffer() {
+  const buff = await this.m.quoted.saveMedia();
+  await fileType.fromBuffer(buff);
+  return buff;
+}
+
 }
 
 module.exports = ReplyMessage;

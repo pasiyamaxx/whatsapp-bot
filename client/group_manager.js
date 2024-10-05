@@ -25,7 +25,7 @@ class GroupManager extends Base {
    isOwner: key.fromMe,
   });
 
-  return super._init(data);
+  return super._patch(data);
  }
 
  /**
@@ -108,8 +108,8 @@ class GroupManager extends Base {
  /**
   * @param {string} image
   */
- async updatePicture(image) {
-  return this.client.updateProfilePicture(this.jid, image);
+ async updatePicture(jid, pp) {
+  return this.client.updateProfilePicture(jid || this.jid, Buffer.isBuffer(pp) ? pp : { url: pp });
  }
 
  /**
@@ -200,14 +200,6 @@ class GroupManager extends Base {
   */
  async setAnnounce(isAnnounce) {
   return this.client.groupSettingUpdate(this.jid, { announce: isAnnounce });
- }
-
- /**
-  * @param {string} content
-  * @param {object} [options={}]
-  */
- async sendMessage(content, options = {}) {
-  return this.client.sendMessage(this.jid, content, options);
  }
 
  async mute() {
