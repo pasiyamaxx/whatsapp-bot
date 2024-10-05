@@ -11,14 +11,34 @@ bot(
   desc: 'Bot response in milliseconds.',
   type: 'system',
  },
- async (message) => {
+ async (message, match, m, client) => {
+  let wa = {
+    key: { fromMe: false, participant: `0@s.whatsapp.net`, remoteJid: 'status@broadcast' },
+    message: {
+      contactMessage: {
+        displayName: `FX-BOT`,
+        vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:'FX-BOT'\nitem1.TEL;waid=${message.sender.split('@')[0]}:${message.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
+      },
+    },
+  }
   const start = new Date().getTime();
-  const msg = await message.reply('');
+   let pingMsg = await client.sendMessage(message.chat, { text: 'Pinging...' }, { quoted: wa })
   const end = new Date().getTime();
   const responseTime = (end - start) / 1000;
-  await msg.edit(`*ʟᴀᴛᴇɴᴄʏ: ${responseTime} sᴇᴄs*`);
- },
-);
+  await client.relayMessage(
+      message.chat,
+      {
+        protocolMessage: {
+          key: pingMsg.key,
+          type: 14,
+          editedMessage: {
+            conversation: `*Latency: ${responseTime} ms*`,
+          },
+        },
+      },
+      {}
+    )
+  });
 
 bot(
  {
