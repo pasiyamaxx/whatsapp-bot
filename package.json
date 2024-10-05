@@ -3,6 +3,7 @@
  "version": "1.0.5",
  "description": "Simple WhatsApp Bot",
  "main": "index.js",
+ "license": "MIT",
  "author": "AstroX10",
  "scripts": {
   "start": "pm2 start . --attach --name fx-md",
