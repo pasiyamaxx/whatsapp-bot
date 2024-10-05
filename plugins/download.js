@@ -1,5 +1,5 @@
 const config = require('../config');
-const { bot, getJson, postJson, toAudio, toPTT, getBuffer, convertToWebP } = require('../utils');
+const { bot, getJson, postJson, toAudio, toPTT, getBuffer, convertToWebP, twitter } = require('../utils');
 bot(
  {
   pattern: 'spotify ?(.*)',
@@ -90,5 +90,20 @@ bot(
   await message.sendReply('_Downloading_');
   const res = await getJson(`https://giftedapis.us.kg/api/download/gdrivedl?url=${encodeURIComponent(match.trim())}&apikey=gifted`);
   return await message.send(res.result.download);
+ }
+);
+
+bot(
+ {
+  pattern: 'twitter ?(.*)',
+  fromMe: false,
+  desc: 'Downloads Twitter Videos',
+  type: 'download',
+ },
+ async (message, match, m) => {
+  if (!match || !match.includes('x.com' || 'twitter.com')) return await message.reply('*_Provide Twiiter Url_*');
+  await message.sendReply('_Downloading Video_');
+  const res = await twitter(match);
+  return await message.send(res);
  }
 );

@@ -56,7 +56,8 @@ class ReplyMessage extends Base {
  }
  async downloadAndSaveMedia() {
   const filePath = await this.m.quoted.copyNSave();
-  return String(filePath);
+  console.log(filePath);
+  return filePath;
  }
 }
 
