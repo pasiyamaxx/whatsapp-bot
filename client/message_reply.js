@@ -16,7 +16,7 @@ class ReplyMessage extends Base {
   const { key, stanzaId, participant, quotedMessage } = data;
   this.key = key;
   this.id = stanzaId;
-  this.isBaileys = this.id.startsWith('BAE5') || this.id.length === 16;
+  this.isBaileys = (this.id && this.id.startsWith('BAE5')) || (this.id && this.id.length === 16);
   this.jid = participant;
   this.sudo = config.SUDO.split(',').includes(this.jid.split('@')[0]);
   this.fromMe = parsedJid(this.client.user.jid)[0] === parsedJid(this.jid)[0];

@@ -2,35 +2,56 @@ const util = require('util');
 const { bot, getJson, getBuffer, localBuffer, fetchJson } = require('../utils');
 const { exec } = require('child_process');
 
-bot({ on: 'text', fromMe: false, dontAddCommandList: true }, async (message, match, m, client) => {
- const content = message.text
-  ?.replace(/\/\*[\s\S]*?\*\//g, '')
-  .replace(/\/\/.*$/gm, '')
-  .replace(/\n\s*\n/g, '\n')
-  .replace(/\s+/g, ' ')
-  .trim();
+bot(
+ {
+  on: 'text',
+  fromMe: false,
+  dontAddCommandList: true,
+ },
+ async (message, match, m, client) => {
+  const content = message.text?.trim();
+  if (!content) return;
 
- if (!content || !/^[$>^]/.test(content)) return;
+  const isCommand = content.startsWith('>') || content.startsWith('$') || content.startsWith('^');
+  if (!isCommand) return;
 
- const evalCmd = content.slice(1).trim();
- const scope = { message, m, client, match, getJson, getBuffer, exec, fetchJson, localBuffer };
+  const evalCmd = content.slice(1).trim();
 
- try {
-  const isReference = evalCmd.match(/^[a-zA-Z_$][0-9a-zA-Z_$]*$/);
-
-  const evalFunction = new Function(
-   ...Object.keys(scope),
-   `
-        return (async () => {
-            ${isReference ? `return ${evalCmd};` : evalCmd};
-        })();
-      `,
-  )(...Object.values(scope));
-
-  const result = await evalFunction;
-  const replyMessage = util.inspect(result, { depth: 5 }).toString();
-  return await message.reply(replyMessage);
- } catch (error) {
-  return await message.reply(`Error: ${error.message}`);
+  try {
+   const scope = {
+    message,
+    match,
+    m,
+    client,
+    console,
+    require,
+    process,
+    Buffer,
+    fetch,
+    Promise,
+    getJson,
+    getBuffer,
+    exec,
+    bot,
+    fetchJson,
+   };
+   const asyncEval = new Function(...Object.keys(scope), `return (async () => { return ${evalCmd}; })();`);
+   const result = await asyncEval(...Object.values(scope));
+   let replyMessage;
+   if (result === undefined) {
+    replyMessage = 'No result';
+   } else if (typeof result === 'function') {
+    replyMessage = result.toString();
+   } else if (typeof result === 'object' && !Array.isArray(result)) {
+    replyMessage = util.inspect(result, { depth: 5, colors: false, showHidden: false });
+   } else if (Array.isArray(result)) {
+    replyMessage = 'Arrays are not displayed.';
+   } else {
+    replyMessage = result.toString();
+   }
+   await message.reply(replyMessage);
+  } catch (error) {
+   await message.reply(`> *Error: ${error.message}*`);
+  }
  }
-});
+);
