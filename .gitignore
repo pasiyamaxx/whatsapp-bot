@@ -1,6 +1,0 @@
-.gitignore
-node_modules
-.env
-database.db
-session
-test.js

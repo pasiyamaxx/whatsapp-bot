@@ -1,5 +1,5 @@
 const { bot } = require('../utils');
-const { setMessage, getMessage, delMessage, getStatus, toggleStatus } = require('../database').Greetings;
+const { setMessage, getMessage, delMessage, getStatus, toggleStatus } = require('../lib/database').Greetings;
 
 bot(
  {

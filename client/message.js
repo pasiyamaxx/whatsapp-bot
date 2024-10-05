@@ -199,7 +199,7 @@ class Message extends Base {
   }
   return 'text';
  }
- async fdMsg(jid, message, options = {}) {
+ async forwardMessage(jid, message, options = {}) {
   const m = generateWAMessageFromContent(jid, message, {
    ...options,
    userJid: this.client.user.id,

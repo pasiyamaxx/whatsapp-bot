@@ -1,8 +1,8 @@
-const fs = require('fs');
+const path = require('path');
 const axios = require('axios');
-const { TIME_ZONE } = require('../config');
+const { TIME_ZONE, BOT_INFO } = require('../config');
 const { exec } = require('child_process');
-const { bot, tiny, runtime, commands, getOS, getRAMUsage, PluginDB, installPlugin } = require('../utils');
+const { bot, tiny, runtime, commands, getOS, getRAMUsage, PluginDB, installPlugin, getBuffer, localBuffer } = require('../utils');
 
 bot(
  {
@@ -13,32 +13,21 @@ bot(
  },
  async (message, match, m, client) => {
   let wa = {
-    key: { fromMe: false, participant: `0@s.whatsapp.net`, remoteJid: 'status@broadcast' },
-    message: {
-      contactMessage: {
-        displayName: `FX-BOT`,
-        vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:'FX-BOT'\nitem1.TEL;waid=${message.sender.split('@')[0]}:${message.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
-      },
+   key: { fromMe: false, participant: `0@s.whatsapp.net`, remoteJid: 'status@broadcast' },
+   message: {
+    contactMessage: {
+     displayName: `FX-BOT`,
+     vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:'FX-BOT'\nitem1.TEL;waid=${message.sender.split('@')[0]}:${message.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
     },
-  }
+   },
+  };
   const start = new Date().getTime();
-   let pingMsg = await client.sendMessage(message.chat, { text: 'Pinging...' }, { quoted: wa })
+  const pingMsg = await message.reply(message.chat, { text: 'Pinging...' }, { quoted: wa });
   const end = new Date().getTime();
   const responseTime = (end - start) / 1000;
-  await client.relayMessage(
-      message.chat,
-      {
-        protocolMessage: {
-          key: pingMsg.key,
-          type: 14,
-          editedMessage: {
-            conversation: `*Latency: ${responseTime} ms*`,
-          },
-        },
-      },
-      {}
-    )
-  });
+  await pingMsg.edit(`*speed ${responseTime} secs*`, { quoted: wa });
+ }
+);
 
 bot(
  {
@@ -52,6 +41,15 @@ bot(
   const currentTime = new Date().toLocaleTimeString('en-IN', { timeZone: TIME_ZONE });
   const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const currentDate = new Date().toLocaleDateString('en-IN', { timeZone: TIME_ZONE });
+  let wa = {
+   key: { fromMe: false, participant: `0@s.whatsapp.net`, remoteJid: 'status@broadcast' },
+   message: {
+    contactMessage: {
+     displayName: `FX-BOT`,
+     vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:'FX-BOT'\nitem1.TEL;waid=${message.sender.split('@')[0]}:${message.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
+    },
+   },
+  };
   let menuText = `\`\`\`╭─ ғxᴏᴘʀɪsᴀ ᴍᴅ ───
 │ Prefix: ${prefix}
 │ User: ${pushName}
@@ -81,9 +79,18 @@ bot(
    .forEach((category) => {
     menuText += tiny(`\n╭── *${category}* ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`);
    });
-
-  return await message.send(menuText);
- },
+  const menuImage = await getBuffer(BOT_INFO.split(';')[2]);
+  const defaults = await localBuffer(path.join(__dirname, '..', '/assets/images/thumb.jpg'));
+  if (!menuImage) {
+   return await message.send(defaults, { caption: menuText }, { quoted: wa });
+  } else {
+   try {
+    await message.send(menuImage, { caption: menuText });
+   } catch {
+    return message.send(menuText);
+   }
+  }
+ }
 );
 
 bot(
@@ -112,7 +119,7 @@ bot(
   });
 
   return await message.sendMessage(message.jid, commandListText.trim());
- },
+ }
 );
 
 bot(
@@ -125,7 +132,7 @@ bot(
  async (message, match, m, client) => {
   await message.sendReply('_Restarting..._');
   await process.exit(1);
- },
+ }
 );
 
 bot(
@@ -138,7 +145,7 @@ bot(
  async (m) => {
   await m.sendReply('_Shutting Down_');
   await exec(require('../package.json').scripts.stop);
- },
+ }
 );
 
 bot(
@@ -150,7 +157,7 @@ bot(
  },
  async (message, match) => {
   message.send(`*Uptime:* ${runtime(process.uptime())}`);
- },
+ }
 );
 
 bot(
@@ -170,7 +177,7 @@ bot(
   require(`./${plugin_name}`);
   await installPlugin(url, plugin_name);
   message.send(`_Installed: ${plugin_name}_`);
- },
+ }
 );
 
 bot(
@@ -184,7 +191,7 @@ bot(
   const plugins = await PluginDB.findAll();
   if (plugins.length < 1) return message.send('_External Plugins Not Found_');
   message.send(plugins.map((p) => `\`\`\`${p.dataValues.name}\`\`\`: ${p.dataValues.url}`).join('\n'));
- },
+ }
 );
 
 bot(
@@ -202,5 +209,5 @@ bot(
   delete require.cache[require.resolve(`./${match}.js`)];
   fs.unlinkSync(`${__dirname}/${match}.js`);
   message.sendMessage(`Plugin ${match} deleted`);
- },
+ }
 );

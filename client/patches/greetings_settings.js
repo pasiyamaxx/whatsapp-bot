@@ -1,5 +1,5 @@
 const { FiletypeFromUrl, parseJid, extractUrlFromMessage } = require('../../utils');
-const { getStatus, getMessage } = require('../../database').Greetings;
+const { getStatus, getMessage } = require('../../lib/database').Greetings;
 
 async function Greetings(data, conn) {
  const metadata = await conn.groupMetadata(data.id);

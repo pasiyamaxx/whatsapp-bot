@@ -148,15 +148,3 @@ bot(
   );
  }
 );
-
-bot(
- {
-  pattern: 'test',
-  fromMe: false,
-  desc: 'test quotation',
-  type: 'test',
- },
- async (message) => {
-  return message.send('hello', { quoted: message });
- }
-);
