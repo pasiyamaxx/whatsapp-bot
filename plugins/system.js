@@ -1,30 +1,24 @@
-const os = require('os');
-const util = require('util');
-const { bot, tiny, runtime, commands, getJson, getBuffer, localBuffer } = require('../utils');
+const fs = require('fs');
+const axios = require('axios');
 const { TIME_ZONE } = require('../config');
 const { exec } = require('child_process');
-const fetchJson = getJson;
+const { bot, tiny, runtime, commands, getOS, getRAMUsage, PluginDB, installPlugin } = require('../utils');
 
-function getRAMUsage() {
- const totalMemory = os.totalmem();
- const freeMemory = os.freemem();
- const usedMemory = totalMemory - freeMemory;
- return `${(usedMemory / 1024 / 1024 / 1024).toFixed(2)} GB / ${(totalMemory / 1024 / 1024 / 1024).toFixed(2)} GB`;
-}
-
-function getOS() {
- const osType = os.type();
- switch (osType) {
-  case 'Linux':
-   return 'Linux';
-  case 'Darwin':
-   return 'MacOS';
-  case 'Windows_NT':
-   return 'Windows';
-  default:
-   return 'VPS';
- }
-}
+bot(
+ {
+  pattern: 'ping',
+  fromMe: false,
+  desc: 'Bot response in milliseconds.',
+  type: 'system',
+ },
+ async (message) => {
+  const start = new Date().getTime();
+  const msg = await message.reply('');
+  const end = new Date().getTime();
+  const responseTime = (end - start) / 1000;
+  await msg.edit(`*ʟᴀᴛᴇɴᴄʏ: ${responseTime} sᴇᴄs*`);
+ },
+);
 
 bot(
  {
@@ -34,7 +28,7 @@ bot(
   dontAddCommandList: true,
  },
  async (message) => {
-  const { prefix, pushName, jid } = message;
+  const { prefix, pushName } = message;
   const currentTime = new Date().toLocaleTimeString('en-IN', { timeZone: TIME_ZONE });
   const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const currentDate = new Date().toLocaleDateString('en-IN', { timeZone: TIME_ZONE });
@@ -129,22 +123,6 @@ bot(
 
 bot(
  {
-  pattern: 'ping',
-  fromMe: false,
-  desc: 'Bot response in milliseconds.',
-  type: 'system',
- },
- async (message) => {
-  const start = new Date().getTime();
-  const msg = await message.reply('');
-  const end = new Date().getTime();
-  const responseTime = (end - start) / 1000;
-  await msg.edit(`*ʟᴀᴛᴇɴᴄʏ: ${responseTime} sᴇᴄs*`);
- },
-);
-
-bot(
- {
   pattern: 'runtime',
   fromMe: false,
   desc: 'Check uptime of bot',
@@ -155,71 +133,54 @@ bot(
  },
 );
 
-const errorTracker = new Set();
+bot(
+ {
+  pattern: 'install',
+  fromMe: true,
+  desc: 'Installs External plugins',
+  type: 'system',
+ },
+ async (message, match, m, client) => {
+  if (!match) return message.reply('_Provide Plugin URl_');
+  let url = new URL(match);
+  if (url.host === 'gist.github.com') url = `https://gist.githubusercontent.com${url.pathname}/raw`;
+  const { data } = await axios.get(url);
+  const plugin_name = data.match(/(?<=pattern:) ["'](.*?)["']/)?.[1]?.split(' ')?.[0] || `__${Math.random().toString(36).slice(2)}`;
+  fs.writeFileSync(`${__dirname}/${plugin_name}.js`, data);
+  require(`./${plugin_name}`);
+  await installPlugin(url, plugin_name);
+  message.send(`_Installed: ${plugin_name}_`);
+ },
+);
 
 bot(
  {
-  on: 'text',
-  fromMe: false,
-  dontAddCommandList: true,
+  pattern: 'plugin',
+  fromMe: true,
+  desc: 'plugin list',
+  type: 'system',
  },
  async (message, match, m, client) => {
-  const content = message.text?.trim();
-  if (!content) return;
+  const plugins = await PluginDB.findAll();
+  if (plugins.length < 1) return message.send('_External Plugins Not Found_');
+  message.send(plugins.map((p) => `\`\`\`${p.dataValues.name}\`\`\`: ${p.dataValues.url}`).join('\n'));
+ },
+);
 
-  const isCommand = content.startsWith('>') || content.startsWith('$') || content.startsWith('^');
-  if (!isCommand) return;
-
-  const evalCmd = content.slice(1).trim();
-
-  // Unique identifier for the message to track errors
-  const messageId = message.id;
-
-  try {
-   const scope = {
-    message,
-    match,
-    m,
-    client,
-    console,
-    require,
-    process,
-    Buffer,
-    fetch,
-    Promise,
-    getJson,
-    getBuffer,
-    exec,
-    bot,
-    fetchJson,
-    localBuffer,
-   };
-
-   const asyncEval = new Function(...Object.keys(scope), `return (async () => { return ${evalCmd}; })();`);
-   const result = await asyncEval(...Object.values(scope));
-
-   let replyMessage;
-   if (result === undefined) {
-    replyMessage = 'No result';
-   } else if (typeof result === 'function') {
-    replyMessage = result.toString();
-   } else if (typeof result === 'object' && !Array.isArray(result)) {
-    replyMessage = util.inspect(result, { depth: 5, colors: false, showHidden: false });
-   } else if (Array.isArray(result)) {
-    replyMessage = 'Arrays are not displayed.';
-   } else {
-    replyMessage = result.toString();
-   }
-
-   await message.reply(replyMessage);
-   // Clear error tracking if successful
-   errorTracker.delete(messageId);
-  } catch (error) {
-   // Only reply if the error has not been reported for this message
-   if (!errorTracker.has(messageId)) {
-    errorTracker.add(messageId);
-    return await message.reply(`> *Error: ${error.message}*`);
-   }
-  }
+bot(
+ {
+  pattern: 'remove',
+  fromMe: true,
+  desc: 'Remove external plugins',
+  type: 'system',
+ },
+ async (message, match, m, client) => {
+  if (!match) return message.sendMessage('_Need a plugin name_');
+  const plugin = await PluginDB.findOne({ where: { name: match } });
+  if (!plugin) return message.sendMessage('_Plugin not found_');
+  await plugin.destroy();
+  delete require.cache[require.resolve(`./${match}.js`)];
+  fs.unlinkSync(`${__dirname}/${match}.js`);
+  message.sendMessage(`Plugin ${match} deleted`);
  },
 );

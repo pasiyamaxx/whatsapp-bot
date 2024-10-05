@@ -142,10 +142,8 @@ class Message extends Base {
  async send(content, options = {}) {
   const jid = this.jid || options.jid;
   if (!jid) throw new Error('JID is required to send a message.');
-
   const type = options.type || (await this.detectType(content));
   const mergedOptions = { packname: 'ғxᴏᴘ-ᴍᴅ', author: 'ᴀsᴛʀᴏ', quoted: this, ...options };
-
   return this.sendMessage(jid, content, mergedOptions, type);
  }
 

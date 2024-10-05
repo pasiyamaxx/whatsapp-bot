@@ -92,15 +92,3 @@ bot(
   return await message.send(res.result.download);
  }
 );
-
-// bot(
-//   {
-//     pattern: 'mediafire ?(.*)',
-//     fromeMe: false,
-//     desc: 'Downloads Mediafire files',
-//     type: 'download'
-//   },
-//   async (message,match,m,client) => {
-//     if(!match || )
-//   }
-// )
