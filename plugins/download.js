@@ -1,5 +1,5 @@
 const config = require('../config');
-const { bot, getJson, postJson, toAudio, toPTT, getBuffer, convertToWebP, twitter, pinterest } = require('../utils');
+const { bot, getJson, postJson, toAudio, aptoideDl, toPTT, getBuffer, convertToWebP, twitter, pinterest } = require('../utils');
 bot(
  {
   pattern: 'spotify ?(.*)',
@@ -121,5 +121,42 @@ bot(
   for (const images of res) {
    await message.send(images);
   }
+ }
+);
+
+bot(
+ {
+  pattern: 'apk',
+  fromMe: false,
+  desc: 'Search & Download Apk files',
+  type: 'download',
+ },
+ async (message, match) => {
+  if (!match) return message.reply('_Provide Apk Name_');
+  const msg = await message.reply(`_Searching for ${match}_`);
+  const res = await aptoideDl(match);
+  await msg.edit(`_Found ${res.appname}. Downloading..._`);
+  const apkBuffer = await getBuffer(res.link);
+  await message.bot.sendMessage(
+   message.jid,
+   {
+    document: apkBuffer,
+    fileName: `${res.appname}.apk`,
+    mimetype: 'application/vnd.android.package-archive',
+   },
+   { quoted: message }
+  );
+ }
+);
+
+bot(
+ {
+  pattern: 'test',
+  fromMe: false,
+  desc: 'test quotation',
+  type: 'test',
+ },
+ async (message) => {
+  return message.send('hello', { quoted: message });
  }
 );

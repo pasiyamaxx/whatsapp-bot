@@ -12,8 +12,9 @@ bot(
   if (!m.quoted) return await message.sendReply('_Reply ViewOnce Message_');
   let buff = await m.quoted.copyNSave();
   const media = await localBuffer(buff);
+  await message.sendReply('_Message Saved_');
   return await message.send(media, { jid: message.user });
- },
+ }
 );
 
 bot(
@@ -28,7 +29,7 @@ bot(
   let buff = await m.quoted.download();
   await message.setPP(message.user, buff);
   return await message.reply('_Profile Picture Updated_');
- },
+ }
 );
 
 bot(
@@ -42,7 +43,7 @@ bot(
   if (!match) return await message.reply('_Enter name_');
   await message.updateName(match);
   return await message.reply(`_Username Updated : ${match}_`);
- },
+ }
 );
 
 bot(
@@ -64,7 +65,7 @@ bot(
    await message.reply('_Blocked_');
    return await message.block(message.jid);
   }
- },
+ }
 );
 
 bot(
@@ -86,7 +87,7 @@ bot(
    await message.unblock(message.jid);
    return await message.reply('_User unblocked_');
   }
- },
+ }
 );
 
 bot(
@@ -98,7 +99,7 @@ bot(
  },
  async (message, match) => {
   return await message.sendMessage(message.jid, message.mention[0] || message.reply_message.jid || message.jid);
- },
+ }
 );
 
 bot(
@@ -111,7 +112,7 @@ bot(
  async (message, match, m, client) => {
   if (!message.reply_message) return await message.reply('_Reply Message_');
   await client.sendMessage(message.jid, { delete: message.reply_message.key });
- },
+ }
 );
 
 bot(
@@ -129,7 +130,20 @@ bot(
   msg = await serialize(JSON.parse(JSON.stringify(msg.message)), message.client);
   if (!msg.quoted) return await message.reply('No quoted message found');
   await message.fdMSg(message.jid, msg.quoted.message);
+ }
+);
+
+bot(
+ {
+  pattern: 'sms ?(.*)',
+  fromMe: true,
+  desc: 'Saves Message to Dm',
+  type: 'whatsapp',
  },
+ async (message, match, m, client) => {
+  if (!message.reply_message) return await message.sendReply('_Reply Message_');
+  return await message.fdMsg(message.user, m.quoted);
+ }
 );
 
 bot(
@@ -142,7 +156,7 @@ bot(
  async (message, match, m, client) => {
   if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.sendReply('_Reply Status_');
   return await message.fdMsg(message.user, m.quoted);
- },
+ }
 );
 
 bot(
@@ -158,7 +172,7 @@ bot(
   let quotedMsg = m;
   for (const jid of jids) await message.fdMSg(jid, m.quoted.message, { quoted: quotedMsg });
   return await message.sendReply('_Forwarded to ' + match + '_');
- },
+ }
 );
 
 bot(
@@ -173,7 +187,7 @@ bot(
   let jids = parsedJid(match);
   for (const jid of jids) await message.forward(jid, m.quoted);
   return await message.sendReply('_Forwarded to ' + match + '_');
- },
+ }
 );
 
 bot(
@@ -186,7 +200,7 @@ bot(
  async (message, match, m, client) => {
   if (!message.reply_message) return await message.reply('_Reply Message From You_');
   return await message.reply_message.edit(match, { key: message.reply_message.key });
- },
+ }
 );
 
 bot(
@@ -213,7 +227,7 @@ bot(
    name = `_Group : ${gname}_\n_Name : ${getname}_`;
   }
   return await message.sendMessage(DELETED_LOG_CHAT, `_Message Deleted_\n_From : ${msg.from}_\n${name}\n_SenderJid : ${msg.sender}_`, { quoted: deleted });
- },
+ }
 );
 
 bot(
@@ -226,7 +240,7 @@ bot(
  async (message, match, m, client) => {
   await client.chatModify({ delete: true, lastMessages: [{ key: message.data.key, messageTimestamp: message.messageTimestamp }] }, message.jid);
   await message.reply('_Cleared.._');
- },
+ }
 );
 
 bot(
@@ -240,7 +254,7 @@ bot(
   const lstMsg = { message: message.message, key: message.key, messageTimestamp: message.timestamp };
   await client.chatModify({ archive: true, lastMessages: [lstMsg] }, message.jid);
   await message.reply('_Archived.._');
- },
+ }
 );
 
 bot(
@@ -254,7 +268,7 @@ bot(
   const lstMsg = { message: message.message, key: message.key, messageTimestamp: message.timestamp };
   await client.chatModify({ archive: false, lastMessages: [lstMsg] }, message.jid);
   await message.reply('_Unarchived.._');
- },
+ }
 );
 
 bot(
@@ -267,7 +281,7 @@ bot(
  async (message, match, m, client) => {
   await client.chatModify({ pin: true }, message.jid);
   await message.reply('_Pined.._');
- },
+ }
 );
 
 bot(
@@ -280,7 +294,7 @@ bot(
  async (message, match, m, client) => {
   await client.chatModify({ pin: false }, message.jid);
   await message.reply('_Unpined.._');
- },
+ }
 );
 
 // bot(

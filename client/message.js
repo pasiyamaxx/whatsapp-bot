@@ -143,10 +143,26 @@ class Message extends Base {
   const jid = this.jid || options.jid;
   if (!jid) throw new Error('JID is required to send a message.');
   const type = options.type || (await this.detectType(content));
-  const mergedOptions = { packname: 'ғxᴏᴘ-ᴍᴅ', author: 'ᴀsᴛʀᴏ', quoted: this, ...options };
+
+  let quotedMsg = null;
+  if (options.quoted) {
+   quotedMsg = {
+    key: options.quoted.key,
+    message: {
+     [options.quoted.mtype]: options.quoted.message[options.quoted.mtype],
+    },
+   };
+  }
+
+  const mergedOptions = {
+   packname: 'ғxᴏᴘ-ᴍᴅ',
+   author: 'ᴀsᴛʀᴏ',
+   quoted: quotedMsg,
+   ...options,
+  };
+
   return this.sendMessage(jid, content, mergedOptions, type);
  }
-
  async forward(jid, content, options = {}) {
   if (options.readViewOnce) {
    content = content?.ephemeralMessage?.message || content;
@@ -182,6 +198,17 @@ class Message extends Base {
    return mime?.split('/')[0] || 'text';
   }
   return 'text';
+ }
+ async fdMsg(jid, message, options = {}) {
+  const m = generateWAMessageFromContent(jid, message, {
+   ...options,
+   userJid: this.client.user.id,
+  });
+  await this.client.relayMessage(jid, m.message, {
+   messageId: m.key.id,
+   ...options,
+  });
+  return m;
  }
 }
 
