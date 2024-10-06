@@ -1,57 +1,35 @@
 const util = require('util');
-const { bot, getJson, getBuffer, localBuffer, fetchJson } = require('../utils');
-const { exec } = require('child_process');
+const { bot } = require('../utils');
 
 bot(
  {
   on: 'text',
-  fromMe: false,
+  fromMe: true,
   dontAddCommandList: true,
  },
  async (message, match, m, client) => {
   const content = message.text?.trim();
   if (!content) return;
 
-  const isCommand = content.startsWith('>') || content.startsWith('$') || content.startsWith('^');
-  if (!isCommand) return;
+  if (!content.startsWith('>') && !content.startsWith('$') && !content.startsWith('^')) return;
 
   const evalCmd = content.slice(1).trim();
 
   try {
-   const scope = {
-    message,
-    match,
-    m,
-    client,
-    console,
-    require,
-    process,
-    Buffer,
-    fetch,
-    Promise,
-    getJson,
-    getBuffer,
-    exec,
-    bot,
-    fetchJson,
-   };
-   const asyncEval = new Function(...Object.keys(scope), `return (async () => { return ${evalCmd}; })();`);
-   const result = await asyncEval(...Object.values(scope));
+   const result = await eval(`(async () => { ${evalCmd} })()`);
    let replyMessage;
+
    if (result === undefined) {
     replyMessage = 'No result';
-   } else if (typeof result === 'function') {
-    replyMessage = result.toString();
-   } else if (typeof result === 'object' && !Array.isArray(result)) {
-    replyMessage = util.inspect(result, { depth: 5, colors: false, showHidden: false });
-   } else if (Array.isArray(result)) {
-    replyMessage = 'Arrays are not displayed.';
+   } else if (typeof result === 'object') {
+    replyMessage = util.inspect(result, { depth: 1, colors: false });
    } else {
     replyMessage = result.toString();
    }
+
    await message.reply(replyMessage);
   } catch (error) {
-   await message.reply(`> *Error: ${error.message}*`);
+   await message.reply(`Error: ${error.message}`);
   }
  }
 );
