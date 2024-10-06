@@ -20,9 +20,10 @@ bot(
    await message.sendMessage(message.jid, '*Updating...*');
    exec(`git stash && git pull origin ${config.BRANCH}`, async () => {
     await message.sendMessage(message.jid, '*Restarting...*');
+    exec('npm restart');
     if ((await git.diff([`${config.BRANCH}..origin/${config.BRANCH}`])).includes('"dependencies":')) {
      await message.sendMessage(message.chat, 'Updating System Files...');
-     exec(`npm install && ${require('../package.json').scripts.start}`);
+     exec(`npm install && npm restart`);
     }
    });
   } else {
@@ -30,5 +31,5 @@ bot(
    commits.all.forEach((commit, i) => (changes += `${i + 1}. ${commit.message}\n`));
    await message.sendMessage(message.jid, changes + `\n*To update, send* ${message.prefix}update now`);
   }
- },
+ }
 );
