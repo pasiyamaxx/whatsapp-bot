@@ -3,11 +3,10 @@ const config = require('../config');
 const ReplyMessage = require('./message_reply');
 const GroupManager = require('./group_manager');
 const UserProfileManager = require('./chats_manager');
-const { decodeJid, createInteractiveMessage, parsedJid, writeExifWebp, isUrl } = require('../utils');
-const { generateWAMessageFromContent, generateWAMessage, generateForwardMessageContent, getContentType } = require('@adiwajshing/baileys');
+const { decodeJid, parsedJid, writeExifWebp, isUrl } = require('../utils');
+const { generateWAMessageFromContent, generateForwardMessageContent, getContentType } = require('baileys');
 const fileType = require('file-type');
 const fs = require('fs').promises;
-const path = require('path');
 
 class Message extends Base {
  constructor(client, data) {
