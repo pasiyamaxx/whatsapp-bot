@@ -162,24 +162,16 @@ bot(
 bot(
  {
   pattern: 'forward ?(.*)',
-  fromMe: false,
-  desc: 'Forward Message.',
+  fromMe: true,
+  desc: 'Forwards the replied message (any type)',
   type: 'whatsapp',
  },
  async (message, match, m) => {
   if (!m.quoted) return await message.reply('Reply to a message to forward');
-
-  let jids = parsedJid(match);
-  let quotedMsg = m.quoted;
-
+  const jids = parsedJid(match);
   for (const jid of jids) {
-   try {
-    await message.forward(jid, quotedMsg.message, { quoted: m });
-   } catch (err) {
-    await message.reply(`Failed to forward message to ${jid}: ${err.message}`);
-   }
+   await message.forward(jid, m.quoted);
   }
-  return await message.reply('_Forwarded to ' + match + '_');
  }
 );
 
@@ -246,7 +238,7 @@ bot(
   type: 'whatsapp',
  },
  async (message, match, m, client) => {
-  await client.chatModify({ delete: true, lastMessages: [{ key: message.data.key, messageTimestamp: message.messageTimestamp }] }, message.jid);
+  await client.chatModify({ delete: true, lastMessages: [{ key: message.data.key, messageTimestamp: message.timestamp }] }, message.jid);
   await message.reply('_Cleared.._');
  }
 );
