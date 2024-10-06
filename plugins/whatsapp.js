@@ -157,8 +157,16 @@ bot(
  async (message, match, m) => {
   if (!m.quoted) return await message.reply('Reply to a message to forward');
   const jids = parsedJid(match);
+
   for (const jid of jids) {
-   await message.copyNForward(jid, m.quoted);
+   try {
+    // Use the message object to call copyNForward
+    await message.copyNForward(jid, m.quoted.fakeObj);
+    await message.reply(`Message forwarded to ${jid}`);
+   } catch (error) {
+    console.error(`Error forwarding to ${jid}:`, error);
+    await message.reply(`Failed to forward message to ${jid}`);
+   }
   }
  }
 );
