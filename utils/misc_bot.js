@@ -1,5 +1,5 @@
 const MEDIA = require('../config');
-const { localBuffer, getBuffer } = require('./utils');
+const { localBuffer, getBuffer } = require('./data_buffers');
 const path = require('path');
 async function images() {
  if (!MEDIA) {
