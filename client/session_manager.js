@@ -12,7 +12,7 @@ class SessionManager {
    throw new Error('Session ID is empty');
   }
   this.zipPath = join(__dirname, `session_${this.id}.zip`);
-  this.dirPath = join(__dirname, '../session');
+  this.dirPath = join(__dirname, '../lib/session');
  }
 
  async createSession() {
@@ -24,26 +24,25 @@ class SessionManager {
  }
 
  async downloadSession() {
+  const response = await get(`https://session-manager-x9wf.onrender.com/download/${this.id}`, { responseType: 'stream' });
+  const writeStream = createWriteStream(this.zipPath);
+
   return new Promise((resolve, reject) => {
-   get(`https://session-manager-x9wf.onrender.com/download/${this.id}`, { responseType: 'stream' })
-    .then(({ data }) => {
-     const writeStream = createWriteStream(this.zipPath);
-     data.pipe(writeStream);
-     writeStream.on('finish', resolve);
-     writeStream.on('error', reject);
-    })
-    .catch(reject);
+   response.data.pipe(writeStream);
+   writeStream.on('finish', resolve);
+   writeStream.on('error', reject);
   });
  }
 
  async extractSession() {
   return new Promise((resolve, reject) => {
-   fs
-    .createReadStream(this.zipPath)
+   const readStream = fs.createReadStream(this.zipPath);
+   readStream
     .pipe(unzipper.Parse())
     .on('entry', async (entry) => {
      const outputPath = join(this.dirPath, entry.path);
      const writeStream = createWriteStream(outputPath);
+
      entry
       .pipe(writeStream)
       .on('finish', () => {
