@@ -39,4 +39,6 @@ This project utilizes a custom server designed for efficient management of authe
 
 This project is licensed under the MIT License. You are free to use, modify, and distribute the software, provided that the original license and copyright notice are included in all copies or substantial portions of the software.
 
-For more details, please see the [LICENSE](LICENSE) file in the repository.
+### FOSSA TEST
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAstroX10%2Fwhatsapp-bot.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2FAstroX10%2Fwhatsapp-bot?ref=badge_shield&issueType=security)
