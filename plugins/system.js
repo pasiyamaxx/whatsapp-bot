@@ -79,7 +79,7 @@ bot(
    .forEach((category) => {
     menuText += tiny(`\n╭── *${category}* ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`);
    });
-  return client.sendMessage(message.jid, { text: menuText });
+  return client.sendMessage(message.jid, { text: menuText }, { quoted: wa });
  }
 );
 
