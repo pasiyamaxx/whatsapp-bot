@@ -41,19 +41,27 @@ bot(
   const currentTime = new Date().toLocaleTimeString('en-IN', { timeZone: TIME_ZONE });
   const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const currentDate = new Date().toLocaleDateString('en-IN', { timeZone: TIME_ZONE });
-
+  let wa = {
+   key: { fromMe: false, participant: `0@s.whatsapp.net`, remoteJid: 'status@broadcast' },
+   message: {
+    contactMessage: {
+     displayName: `FX-BOT`,
+     vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:'FX-BOT'\nitem1.TEL;waid=${message.sender.split('@')[0]}:${message.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
+    },
+   },
+  };
   let menuText = `\`\`\`╭─ ғxᴏᴘʀɪsᴀ ᴍᴅ ───
- │ Prefix: ${prefix}
- │ User: ${pushName}
- │ Os: ${getOS()}
- │ Plugins: ${commands.length}
- │ Runtime: ${runtime(process.uptime())}
- │ Ram: ${getRAMUsage()}
- │ Time: ${currentTime}
- │ Day: ${currentDay}
- │ Date: ${currentDate}
- │ Version: ${require('../package.json').version}
- ╰────────────────\`\`\`\n`;
+│ Prefix: ${prefix}
+│ User: ${pushName}
+│ Os: ${getOS()}
+│ Plugins: ${commands.length}
+│ Runtime: ${runtime(process.uptime())}
+│ Ram: ${getRAMUsage()}
+│ Time: ${currentTime}
+│ Day: ${currentDay}
+│ Date: ${currentDate}
+│ Version: ${require('../package.json').version}
+╰────────────────\`\`\`\n`;
 
   const categorized = commands
    .filter((cmd) => cmd.pattern && !cmd.dontAddCommandList)
@@ -69,7 +77,7 @@ bot(
   Object.keys(categorized)
    .sort()
    .forEach((category) => {
-    menuText += `\n*${category}*:\n${categorized[category].sort().join(', ')}\n`;
+    menuText += tiny(`\n╭── *${category}* ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`);
    });
   return client.sendMessage(message.jid, { text: menuText });
  }
