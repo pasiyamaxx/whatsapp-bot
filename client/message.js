@@ -37,6 +37,7 @@ class Message extends Base {
   const senderID = contextInfo?.participant || key.remoteJid;
 
   Object.assign(this, {
+   data,
    user: decodeJid(this.client.user.id),
    key,
    isGroup,
@@ -52,7 +53,6 @@ class Message extends Base {
    sudo: config.SUDO.split(',').includes(this.participant?.split('@')[0]) || false,
    text: data.body,
    fromMe: key.fromMe,
-   isBaileys: key.id.startsWith('BAE5'),
    timestamp: messageTimestamp.low || messageTimestamp,
    mention: contextInfo?.mentionedJid || false,
    isOwner: key.fromMe,
@@ -73,6 +73,7 @@ class Message extends Base {
   } else {
    this.reply_message = false;
   }
+
   if (message.stickerMessage) this.sticker = true;
   if (message.videoMessage) this.video = message.videoMessage;
   if (message.imageMessage) this.image = message.imageMessage;
