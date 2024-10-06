@@ -8,9 +8,7 @@ const fs = require('fs');
 class SessionManager {
  constructor() {
   this.id = config.SESSION_ID.replace(/^Session~/, '').trim();
-  if (!this.id) {
-   throw new Error('Session ID is empty');
-  }
+  if (!this.id) throw new Error('Session ID is empty') && process.exit(1);
   this.zipPath = join(__dirname, `session_${this.id}.zip`);
   this.dirPath = join(__dirname, '../lib/session');
  }
@@ -45,9 +43,7 @@ class SessionManager {
 
      entry
       .pipe(writeStream)
-      .on('finish', () => {
-       console.log(`Extracted: ${outputPath}`);
-      })
+      .on('finish', () => {})
       .on('error', (error) => {
        console.error(`Failed to extract ${entry.path}:`, error);
        reject(error);
