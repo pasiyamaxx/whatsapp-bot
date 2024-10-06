@@ -130,7 +130,7 @@ bot(
   if (!msg) return await message.reply('_Message not found maybe bot might not be running at that time_');
   msg = await serialize(JSON.parse(JSON.stringify(msg.message)), message.client);
   if (!msg.quoted) return await message.reply('No quoted message found');
-  await message.forward(message.jid, msg.quoted.message);
+  await message.forward(message.jid, msg.quoted);
  }
 );
 
@@ -143,7 +143,7 @@ bot(
  },
  async (message, match, m, client) => {
   if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.reply('_Reply to a status message containing an image, video, or audio_');
-  return await message.copyNForward(message.user, message.reply_message, { quoted: message.data });
+  return await message.copyNForward(message.user, m.quoted);
  }
 );
 
@@ -158,7 +158,7 @@ bot(
   if (!m.quoted) return await message.reply('Reply to a message to forward');
   const jids = parsedJid(match);
   for (const jid of jids) {
-   await message.copyNForward(jid, m.quoted, { quoted: m.quoted });
+   await message.copyNForward(jid, m.quoted);
   }
  }
 );
