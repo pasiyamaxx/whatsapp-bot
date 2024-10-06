@@ -194,6 +194,17 @@ class Message extends Base {
    messageId: waMessage.key.id,
   });
  }
+ async forwardlite(jid, message, options = {}) {
+  const m = generateWAMessageFromContent(jid, message, {
+   ...options,
+   userJid: this.client.user.id,
+  });
+  await this.client.relayMessage(jid, m.message, {
+   messageId: m.key.id,
+   ...options,
+  });
+  return m;
+ }
 }
 
 module.exports = Message;
