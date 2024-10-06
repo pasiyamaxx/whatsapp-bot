@@ -4,10 +4,11 @@ const toBool = (x) => x === 'true';
 const DATABASE_URL = process.env.DATABASE_URL || './database.db';
 
 module.exports = {
- BOT_INFO: process.env.BOT_INFO || 'Astro;fxop;https://myimage.jpg',
+ BOT_INFO: process.env.BOT_INFO || 'Astro;fxop;',
  LOGS: toBool(process.env.LOGS) || true,
  SESSION_ID: (process.env.SESSION_ID || '').trim(),
  SUDO: process.env.SUDO || '',
+ MEDIA: process.env.MEDIA || 'https://github.com/AstroX10/whatsapp-bot/raw/refs/heads/master/assets/videos/intro.mp4;https://raw.githubusercontent.com/AstroX10/whatsapp-bot/refs/heads/master/assets/images/thumb.jpg',
  HANDLERS: process.env.HANDLER === 'false' || process.env.HANDLER === 'null' ? '^' : '[.]',
  RMBG_KEY: process.env.RMBG_KEY || '',
  BRANCH: 'master',

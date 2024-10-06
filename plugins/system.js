@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { TIME_ZONE } = require('../config');
 const { exec } = require('child_process');
-const { bot, tiny, runtime, commands, getOS, getRAMUsage, PluginDB, installPlugin } = require('../utils');
+const { bot, tiny, runtime, commands, getOS, getRAMUsage, PluginDB, installPlugin, images } = require('../utils');
 
 bot(
  {
@@ -31,15 +31,6 @@ bot(
   const currentTime = new Date().toLocaleTimeString('en-IN', { timeZone: TIME_ZONE });
   const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const currentDate = new Date().toLocaleDateString('en-IN', { timeZone: TIME_ZONE });
-  let wa = {
-   key: { fromMe: false, participant: `0@s.whatsapp.net`, remoteJid: 'status@broadcast' },
-   message: {
-    contactMessage: {
-     displayName: `FX-BOT`,
-     vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:'FX-BOT'\nitem1.TEL;waid=${message.sender.split('@')[0]}:${message.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
-    },
-   },
-  };
   let menuText = `\`\`\`╭─ ғxᴏᴘʀɪsᴀ ᴍᴅ ───
 │ Prefix: ${prefix}
 │ User: ${pushName}
@@ -69,7 +60,8 @@ bot(
    .forEach((category) => {
     menuText += tiny(`\n╭── *${category}* ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`);
    });
-  return client.sendMessage(message.jid, { text: menuText }, { quoted: wa });
+  const media = await images();
+  return message.send(media, { caption: menuText });
  }
 );
 
