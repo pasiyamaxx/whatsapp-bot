@@ -309,7 +309,7 @@ module.exports = {
 
 const ignore = () => {
  const gitignorePath = path.join(process.cwd(), '.gitignore');
- const ignorePatterns = ['node_modules', 'database.db', 'session', '.env', '.gitignore', 'temp'].join('\n');
+ const ignorePatterns = ['node_modules', 'database.db', 'lib/session', '.env', '.gitignore', 'temp'].join('\n');
  if (!existsSync(gitignorePath)) writeFileSync(gitignorePath, ignorePatterns);
 };
 
