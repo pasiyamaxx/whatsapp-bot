@@ -195,7 +195,7 @@ class Message extends Base {
    messageId: waMessage.key.id,
   });
  }
- async forward(jid, message, options = {}) {
+ async copyNForward(jid, message, options = {}) {
   const m = generateWAMessageFromContent(jid, message, {
    ...options,
    userJid: this.client.user.id,
