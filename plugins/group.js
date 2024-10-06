@@ -18,7 +18,7 @@ bot(
   return await message.reply(`_@${jid[0].split('@')[0]} added_`, {
    mentions: [jid],
   });
- },
+ }
 );
 
 bot(
@@ -44,7 +44,7 @@ bot(
   return await message.reply(`_@${jid[0].split('@')[0]} kicked_`, {
    mentions: [jid],
   });
- },
+ }
 );
 
 bot(
@@ -70,7 +70,7 @@ bot(
   return await message.reply(`_@${jid[0].split('@')[0]} promoted as admin_`, {
    mentions: [jid],
   });
- },
+ }
 );
 bot(
  {
@@ -95,7 +95,7 @@ bot(
   return await message.reply(`_@${jid[0].split('@')[0]} demoted from admin_`, {
    mentions: [jid],
   });
- },
+ }
 );
 
 bot(
@@ -110,7 +110,7 @@ bot(
   if (!isAdmin(message.jid, message.user, message.client)) return await message.reply("_I'm not admin_");
   await message.reply('_Muting_');
   return await client.groupSettingUpdate(message.jid, 'announcement');
- },
+ }
 );
 
 bot(
@@ -125,7 +125,7 @@ bot(
   if (!isAdmin(message.jid, message.user, message.client)) return await message.reply("_I'm not admin_");
   await message.reply('_Unmuting_');
   return await client.groupSettingUpdate(message.jid, 'not_announcement');
- },
+ }
 );
 
 bot(
@@ -145,7 +145,7 @@ bot(
   });
   str += `╰──────────────`;
   message.reply(str);
- },
+ }
 );
 
 bot(
@@ -165,7 +165,7 @@ bot(
   message.sendMessage(message.jid, teks.trim(), {
    mentions: participants.map((a) => a.id),
   });
- },
+ }
 );
 
 bot(
@@ -184,5 +184,5 @@ bot(
   message.sendMessage(message.jid, match, {
    mentions: participants.map((a) => a.id),
   });
- },
+ }
 );

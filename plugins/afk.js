@@ -90,7 +90,7 @@ bot(
   pattern: 'afk ?(.*)',
   fromMe: true,
   desc: 'Sets your status as away from keyboard (AFK).',
-  type: 'user'
+  type: 'user',
  },
  async (message, match) => {
   if (!afkManager.isAfk) {

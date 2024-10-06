@@ -1,7 +1,5 @@
-const { bot, Mode, qrcode, isUrl, Bitly, removeBg, tinyurl, ssweb, shortenurl, upload, IronMan, ffmpeg, parseTimeToSeconds, convertInputsToPDF, getJson } = require('../utils');
+const { bot, qrcode, isUrl, Bitly, removeBg, tinyurl, ssweb, shortenurl, upload, IronMan, convertInputsToPDF, getJson } = require('../utils');
 const config = require('../config');
-const { fromBuffer } = require('file-type');
-const { MessageType } = require('baileys');
 
 bot(
  {

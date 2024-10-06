@@ -1,4 +1,4 @@
-const { bot, Mode, XKCDComic, getJson } = require('../utils');
+const { bot, getJson } = require('../utils');
 const axios = require('axios');
 
 let triviaGames = {};
@@ -27,7 +27,7 @@ bot(
   };
 
   return sendTriviaQuestion(message, userId);
- },
+ }
 );
 
 bot(
@@ -62,7 +62,7 @@ bot(
     }
    }
   }
- },
+ }
 );
 
 function isOptionNumber(answer) {
@@ -138,5 +138,5 @@ bot(
    console.error('Error fetching joke:', error);
    message.reply('Failed to fetch a joke. Please try again later.');
   }
- },
+ }
 );
