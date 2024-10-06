@@ -154,11 +154,9 @@ bot(
   type: 'whatsapp',
  },
  async (message, match, m, client) => {
-  if (!message.reply_message?.image && !message.reply_message?.video && !message.reply_message?.audio) {
-   return await message.reply('_Reply Status_');
-  }
-  const quotedMessage = m.quoted ? m.quoted : message.reply_message;
-  return await message.forwardlite(message.user, { quotedMessage, quoted: quotedMessage });
+  if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.reply('_Reply Status_');
+  let quotedMsg = m.quoted;
+  return await message.forwardlite(message.user, m.quoted, { quoted: quotedMsg });
  }
 );
 
