@@ -3,6 +3,7 @@ const { ensureDir, createWriteStream, remove } = require('fs-extra');
 const { join } = require('path');
 const unzipper = require('unzipper'); // Ensure you have this imported
 const config = require('../config');
+const fs = require('fs');
 
 class SessionManager {
  constructor() {
