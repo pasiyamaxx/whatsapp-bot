@@ -82,14 +82,14 @@ class Message extends Base {
  }
 
  async sendMessage(jid, content, opt = {}, type = 'text') {
-  const sendMedia = (type, content, opt = {}) => {
+  const sendMedia = (type, content, opt = { quoted: this.data }) => {
    const isBuffer = Buffer.isBuffer(content);
    const isUrl = typeof content === 'string' && content.startsWith('http');
    return this.client.sendMessage(opt.jid || this.jid, { [type]: isBuffer ? content : isUrl ? { url: content } : content, ...opt });
   };
 
   const sendFunc = {
-   text: () => this.client.sendMessage(jid || this.jid, { text: content, ...opt }),
+   text: () => this.client.sendMessage(jid || this.jid, { text: content, quoted: this.data, ...opt }),
    image: () => sendMedia('image', content, opt),
    video: () => sendMedia('video', content, opt),
    audio: () => sendMedia('audio', content, opt),
@@ -144,8 +144,7 @@ class Message extends Base {
    return 'text';
   };
   const type = options.type || (await detectType(content));
-  const quotedMsg = this.data;
-  const mergedOptions = { packname: 'ғxᴏᴘ-ᴍᴅ', author: 'ᴀsᴛʀᴏ', quoted: quotedMsg, ...options };
+  const mergedOptions = { packname: 'ғxᴏᴘ-ᴍᴅ', author: 'ᴀsᴛʀᴏ', quoted: this.data, ...options };
 
   return this.sendMessage(jid, content, mergedOptions, type);
  }
