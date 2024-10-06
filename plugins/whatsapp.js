@@ -143,7 +143,7 @@ bot(
  },
  async (message, match, m, client) => {
   if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.reply('_Reply to a status message containing an image, video, or audio_');
-  return await message.copyNForward(message.user, m.quoted);
+  return await message.copyNForward(message.user, m.quoted, { quoted: message.data });
  }
 );
 
