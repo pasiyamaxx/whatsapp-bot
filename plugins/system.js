@@ -36,7 +36,7 @@ bot(
   description: 'Show All Commands',
   dontAddCommandList: true,
  },
- async (message) => {
+ async (message, match, m, client) => {
   const { prefix, pushName } = message;
   const currentTime = new Date().toLocaleTimeString('en-IN', { timeZone: TIME_ZONE });
   const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
@@ -79,17 +79,21 @@ bot(
    .forEach((category) => {
     menuText += tiny(`\n╭── *${category}* ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`);
    });
-  const menuImage = await getBuffer(BOT_INFO.split(';')[2]);
-  const defaults = await localBuffer(path.join(__dirname, '..', '/assets/images/thumb.jpg'));
-  if (!menuImage) {
-   return await message.send(defaults, { caption: menuText }, { quoted: wa });
-  } else {
-   try {
-    await message.send(menuImage, { caption: menuText });
-   } catch {
-    return message.send(menuText);
-   }
-  }
+  const media = await localBuffer(path.join(__dirname, '..', '/assets/images/thumb.jpg'));
+  const ads = {
+   text: menuText,
+   contextInfo: {
+    externalAdReply: {
+     title: 'FX',
+     body: 'Simple WhatsApp Bot',
+     mediaType: 1,
+     thumbnail: media,
+     mediaUrl: 'https://github.com/AstroX10/whatsapp-bot',
+     sourceUrl: 'https://github.com/AstroX10/whatsapp-bot',
+    },
+   },
+  };
+  return client.sendMessage(message.jid, ads);
  }
 );
 
