@@ -8,7 +8,7 @@ bot(
   type: 'download',
  },
  async (message, match, m, client) => {
-  if (!match || !match.includes('spotify.com')) return await message.sendReply('*_Provide a valid Spotify link!_*');
+  if (!match || !match.includes('spotify.com')) return await message.reply('*_Provide a valid Spotify link!_*');
   const res = await getJson('https://giftedapis.us.kg/api/download/spotifydl?url=' + encodeURIComponent(match.trim()) + '&apikey=gifted');
   const msg = await message.reply('*_Downloading ' + res.data.title + '_*');
   const audio = await toAudio(res.preview);
@@ -25,7 +25,7 @@ bot(
   type: 'download',
  },
  async (message, match, m, client) => {
-  if (!match || !match.includes('facebook.com')) return await message.sendReply('*_Provide Vaild Facebook Url_*');
+  if (!match || !match.includes('facebook.com')) return await message.reply('*_Provide Vaild Facebook Url_*');
   const res = await getJson('https://api.guruapi.tech/fbvideo?url=' + encodeURIComponent(match.trim() + ''));
   const msg = await message.reply('*_Downloading ' + res.result.title + '_*');
   await msg.react('⬇️');
@@ -43,7 +43,7 @@ bot(
   type: 'download',
  },
  async (message, match, m, client) => {
-  if (!match || !match.includes('instagram.com')) return await message.sendReply('*_Provide a Valid Instagram URL_*');
+  if (!match || !match.includes('instagram.com')) return await message.reply('*_Provide a Valid Instagram URL_*');
   const msg = await message.reply('_Downloading_');
   await msg.react('⬇️');
   const res = await getJson(`https://api.guruapi.tech/insta/v1/igdl?url=${encodeURIComponent(match.trim())}`);
@@ -68,7 +68,7 @@ bot(
  },
  async (message, match, m, client) => {
   if (!match || !match.includes('t.me')) return await message.reply('_Downloads Telegram Stickers_');
-  await message.sendReply('_Downloading Stickers_');
+  await message.reply('_Downloading Stickers_');
   const res = await getJson('https://giftedapis.us.kg/api/download/tgs?url=' + encodeURIComponent(match.trim()) + '&apikey=gifted');
   for (const stickerUrl of res.results) {
    const stickerBuffer = await getBuffer(stickerUrl);
@@ -87,7 +87,7 @@ bot(
  },
  async (message, match, m, client) => {
   if (!match || !match.includes('drive.google.com')) return await message.reply('_Provide Google Drive File Url_');
-  await message.sendReply('_Downloading_');
+  await message.reply('_Downloading_');
   const res = await getJson(`https://giftedapis.us.kg/api/download/gdrivedl?url=${encodeURIComponent(match.trim())}&apikey=gifted`);
   return await message.send(res.result.download);
  }
@@ -102,7 +102,7 @@ bot(
  },
  async (message, match, m) => {
   if (!match || !match.includes('x.com' || 'twitter.com')) return await message.reply('*_Provide Twiiter Url_*');
-  await message.sendReply('_Downloading Video_');
+  await message.reply('_Downloading Video_');
   const res = await twitter(match);
   return await message.send(res);
  }

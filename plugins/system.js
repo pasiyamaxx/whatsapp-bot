@@ -102,7 +102,7 @@ bot(
   type: 'system',
  },
  async (message, match, m, client) => {
-  await message.sendReply('_Restarting..._');
+  await message.reply('_Restarting..._');
   await process.exit(1);
  }
 );
@@ -115,7 +115,7 @@ bot(
   type: 'system',
  },
  async (m) => {
-  await m.sendReply('_Shutting Down_');
+  await m.reply('_Shutting Down_');
   await exec(require('../package.json').scripts.stop);
  }
 );

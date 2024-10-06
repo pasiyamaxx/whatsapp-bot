@@ -125,10 +125,6 @@ class Message extends Base {
   return new Message(this.client, message);
  }
 
- async sendReply(text, options = {}) {
-  return this.reply(text, options);
- }
-
  async edit(text, opt = {}) {
   return this.client.sendMessage(this.jid, { text, edit: this.key }, opt);
  }
@@ -146,12 +142,57 @@ class Message extends Base {
    if (Buffer.isBuffer(content)) return (await fileType.fromBuffer(content))?.mime?.split('/')[0] || 'text';
    return 'text';
   };
-
   const type = options.type || (await detectType(content));
   const quotedMsg = options.quoted ? { key: options.quoted.key, message: { [options.quoted.mtype]: options.quoted.message[options.quoted.mtype] } } : null;
   const mergedOptions = { packname: 'ғxᴏᴘ-ᴍᴅ', author: 'ᴀsᴛʀᴏ', quoted: quotedMsg, ...options };
 
   return this.sendMessage(jid, content, mergedOptions, type);
+ }
+ async forward(jid, content, options = {}) {
+  if (options.readViewOnce) {
+   content = content?.ephemeralMessage?.message || content;
+   const viewOnceKey = Object.keys(content)[0];
+   delete content?.ignore;
+   delete content?.viewOnceMessage?.message?.[viewOnceKey]?.viewOnce;
+   content = { ...content?.viewOnceMessage?.message };
+  }
+
+  if (options.mentions) {
+   content[getContentType(content)].contextInfo.mentionedJid = options.mentions;
+  }
+
+  const forwardContent = generateForwardMessageContent(content, false);
+  const contentType = getContentType(forwardContent);
+
+  const forwardOptions = {
+   ptt: options.ptt,
+   waveform: options.audiowave,
+   seconds: options.seconds,
+   fileLength: options.fileLength,
+   caption: options.caption,
+   contextInfo: options.contextInfo,
+  };
+
+  if (options.mentions) {
+   forwardOptions.contextInfo.mentionedJid = options.mentions;
+  }
+
+  if (contentType !== 'conversation') {
+   forwardOptions.contextInfo = content?.message[contentType]?.contextInfo || {};
+  }
+
+  forwardContent[contentType].contextInfo = {
+   ...forwardOptions.contextInfo,
+   ...forwardContent[contentType]?.contextInfo,
+  };
+
+  const waMessage = generateWAMessageFromContent(jid, forwardContent, {
+   ...forwardContent[contentType],
+   ...forwardOptions,
+  });
+  return await client.relayMessage(jid, waMessage.message, {
+   messageId: waMessage.key.id,
+  });
  }
 }
 

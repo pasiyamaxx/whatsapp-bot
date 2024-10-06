@@ -20,7 +20,7 @@ bot(
    const data = await readQr(buffer);
    await message.send(data);
   } else {
-   await message.sendReply(`\`\`\`Wrong Format\`\`\`\n\n${message.prefix}qr (Replied Image)\n\n${message.prefix}qr (text)`);
+   await message.reply(`\`\`\`Wrong Format\`\`\`\n\n${message.prefix}qr (Replied Image)\n\n${message.prefix}qr (text)`);
   }
  }
 );
@@ -49,7 +49,7 @@ bot(
   type: 'tools',
  },
  async (message, match, m) => {
-  if (!config.RMBG_API_KEY) return await message.sendReply('_API key not Set!_');
+  if (!config.RMBG_API_KEY) return await message.reply('_API key not Set!_');
   if (!message.reply_message?.image) return await message.reply('Reply to an image');
   const msg = await message.reply('_Processing Image!_');
   const buff = await m.quoted.download();
@@ -68,8 +68,8 @@ bot(
  },
  async (message, match) => {
   match = match || message.reply_message.text;
-  if (!match) return await message.sendReply(`\`\`\`Wrong format\n\n${message.prefix}tinyurl URL\n\nOR REPLY A MESSAGE\`\`\``);
-  if (!isUrl(match)) return await message.sendReply('_Invalid URL_');
+  if (!match) return await message.reply(`\`\`\`Wrong format\n\n${message.prefix}tinyurl URL\n\nOR REPLY A MESSAGE\`\`\``);
+  if (!isUrl(match)) return await message.reply('_Invalid URL_');
   const msg = await message.reply('_Shortening Link_');
   const shortenText = await tinyurl(match);
   await msg.edit('*_Operation Success_*');
@@ -85,8 +85,8 @@ bot(
   type: 'tools',
  },
  async (message, match) => {
-  if (!match) return await message.sendReply('_Provide URL_');
-  if (!isUrl(match)) return await message.sendReply('_Not A URL_');
+  if (!match) return await message.reply('_Provide URL_');
+  if (!isUrl(match)) return await message.reply('_Not A URL_');
   const msg = await message.reply('_Processing URL_');
   const buff = await ssweb(match);
   await msg.edit('*_Success_*');
@@ -102,8 +102,8 @@ bot(
   type: 'tools',
  },
  async (message, match) => {
-  if (!match) return await message.sendReply('_Provide URL_');
-  if (!isUrl(match)) return await message.sendReply('_Not A URL_');
+  if (!match) return await message.reply('_Provide URL_');
+  if (!isUrl(match)) return await message.reply('_Not A URL_');
   const msg = await message.reply('_Shortening Link_');
   const shortenedTxt = await shortenurl(match);
   await msg.edit('*_Success_*');
@@ -164,7 +164,7 @@ bot(
   msg += `*ᴄᴀᴘɪᴛᴀʟ:* ${capital}\n`;
   msg += `*ᴄᴜʀʀᴇɴᴄʏ:* ${currName} (${currCode})\n`;
   msg += `*ᴘʜᴏɴᴇ ᴄᴏᴅᴇ:* +${phone}`;
-  await message.sendReply(msg);
+  await message.reply(msg);
  }
 );
 
@@ -177,12 +177,9 @@ bot(
  },
  async (message, match, m, client) => {
   const quotedMessage = message.reply_message?.sender || message.mention?.[0];
-
   if (!quotedMessage) return await message.send('_*Reply to a user*_');
-
   const senderNumber = quotedMessage.split('@')[0];
   const wameLink = 'https://wa.me/' + senderNumber;
-
   return await message.send(wameLink);
  }
 );

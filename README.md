@@ -70,7 +70,7 @@ bot(
   const saveMedia = m.quoted.download(); // Downloads a replied Image, Video, or ViewOnce
   const query = match; // Custom query requirements
 
-  if (!query) return await message.sendReply('_Provide a query!_'); // Ensure the user inputs a query
+  if (!query) return await message.reply('_Provide a query!_'); // Ensure the user inputs a query
 
   const replied = message.reply_message || message.reply_audio; // Ensure a reply exists
 

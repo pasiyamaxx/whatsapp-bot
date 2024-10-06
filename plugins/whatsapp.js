@@ -9,10 +9,10 @@ bot(
   type: 'whatsapp',
  },
  async (message, match, m, client) => {
-  if (!m.quoted) return await message.sendReply('_Reply ViewOnce Message_');
+  if (!m.quoted) return await message.reply('_Reply ViewOnce Message_');
   let buff = await m.quoted.copyNSave();
   const media = await localBuffer(buff);
-  await message.sendReply('_Message Saved_');
+  await message.reply('_Message Saved_');
   return await message.send(media, { jid: message.user });
  }
 );
@@ -129,7 +129,7 @@ bot(
   if (!msg) return await message.reply('_Message not found maybe bot might not be running at that time_');
   msg = await serialize(JSON.parse(JSON.stringify(msg.message)), message.client);
   if (!msg.quoted) return await message.reply('No quoted message found');
-  await message.forwardMessage(message.jid, msg.quoted.message);
+  await message.forward(message.jid, msg.quoted.message);
  }
 );
 
@@ -141,8 +141,8 @@ bot(
   type: 'whatsapp',
  },
  async (message, match, m, client) => {
-  if (!message.reply_message) return await message.sendReply('_Reply Message_');
-  return await message.forwardMessage(message.user, m.quoted);
+  if (!message.reply_message) return await message.reply('_Reply Message_');
+  return await message.forward(message.user, m.quoted);
  }
 );
 
@@ -154,8 +154,8 @@ bot(
   type: 'whatsapp',
  },
  async (message, match, m, client) => {
-  if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.sendReply('_Reply Status_');
-  return await message.forwardMessage(message.user, m.quoted);
+  if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.reply('_Reply Status_');
+  return await message.forward(message.user, m.quoted);
  }
 );
 
@@ -174,12 +174,12 @@ bot(
 
   for (const jid of jids) {
    try {
-    await message.forwardMessage(jid, quotedMsg.message, { quoted: m });
+    await message.forward(jid, quotedMsg.message, { quoted: m });
    } catch (err) {
     await message.reply(`Failed to forward message to ${jid}: ${err.message}`);
    }
   }
-  return await message.sendReply('_Forwarded to ' + match + '_');
+  return await message.reply('_Forwarded to ' + match + '_');
  }
 );
 
@@ -194,7 +194,7 @@ bot(
   if (!m.quoted) return await message.reply('Reply to a message to forward');
   let jids = parsedJid(match);
   for (const jid of jids) await message.forward(jid, m.quoted);
-  return await message.sendReply('_Forwarded to ' + match + '_');
+  return await message.reply('_Forwarded to ' + match + '_');
  }
 );
 

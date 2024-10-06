@@ -8,7 +8,7 @@ bot(
   type: 'ai',
  },
  async (message, match, m, client) => {
-  if (!m.quoted) return await message.sendReply('*_Reply An Image Only!_*');
+  if (!m.quoted) return await message.reply('*_Reply An Image Only!_*');
   let buff = await m.quoted.copyNSave();
   const media = await localBuffer(buff);
   const upscaled = await remini(media, 'enhance');
@@ -24,7 +24,7 @@ bot(
   type: 'ai',
  },
  async (message, match, m, client) => {
-  if (!m.quoted) return await message.sendReply('*_Reply Image Only!_*');
+  if (!m.quoted) return await message.reply('*_Reply Image Only!_*');
   let buff = await m.quoted.download();
   const image = await enhanceImage(buff, 'enhance');
   return await message.send(image, { jid: message.jid, quoted: m.quoted });
@@ -39,7 +39,7 @@ bot(
   type: 'ai',
  },
  async (message, match, m, client) => {
-  if (!m.quoted) return await message.sendReply('*_Reply Image Only!_*');
+  if (!m.quoted) return await message.reply('*_Reply Image Only!_*');
   let buff = await m.quoted.download();
   const image = await enhanceImage(buff, 'dehaze');
   return await message.send(image);
@@ -54,7 +54,7 @@ bot(
   type: 'ai',
  },
  async (message, match, m, client) => {
-  if (!m.quoted) return await message.sendReply('*_Reply Image Only!_*');
+  if (!m.quoted) return await message.reply('*_Reply Image Only!_*');
   let buff = await m.quoted.download();
   const image = await enhanceImage(buff, 'recolor');
   return await message.send(image);
