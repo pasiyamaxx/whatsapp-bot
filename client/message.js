@@ -200,7 +200,7 @@ class Message extends Base {
    ...options,
    userJid: this.client.user.id,
   });
-  await this.client.sendMessage(jid, m.message, {
+  await this.client.relayMessage(jid, m.message, {
    messageId: m.key.id,
    quoted: this.data,
    ...options,
