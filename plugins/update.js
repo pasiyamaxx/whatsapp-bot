@@ -20,10 +20,10 @@ bot(
    await message.sendMessage(message.jid, '*Updating...*');
    exec(`git stash && git pull origin ${config.BRANCH}`, async () => {
     await message.sendMessage(message.jid, '*Restarting...*');
-    exec('npm restart');
+    exec('npm start');
     if ((await git.diff([`${config.BRANCH}..origin/${config.BRANCH}`])).includes('"dependencies":')) {
      await message.sendMessage(message.chat, 'Updating System Files...');
-     exec(`npm install && npm restart`);
+     exec(`npm install && npm npm start`);
     }
    });
   } else {
