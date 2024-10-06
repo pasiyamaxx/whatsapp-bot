@@ -144,7 +144,7 @@ class Message extends Base {
    return 'text';
   };
   const type = options.type || (await detectType(content));
-  const quotedMsg = options.quoted ? { key: options.quoted.key, message: { [options.quoted.mtype]: options.quoted.message[options.quoted.mtype] } } : null;
+  const quotedMsg = this.data;
   const mergedOptions = { packname: 'ғxᴏᴘ-ᴍᴅ', author: 'ᴀsᴛʀᴏ', quoted: quotedMsg, ...options };
 
   return this.sendMessage(jid, content, mergedOptions, type);
