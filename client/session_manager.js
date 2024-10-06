@@ -41,19 +41,16 @@ class SessionManager {
   const files = await directoryEntries.list();
   for (const file of files) {
    const outputPath = join(this.dirPath, file.path);
-   if (file.type === 'File') {
-    const existingFilePath = join(this.dirPath, file.path);
-    if (fs.existsSync(existingFilePath)) {
-     const writeStream = createWriteStream(existingFilePath);
+   const writeStream = createWriteStream(outputPath);
+   try {
+    if (file.type === 'File') {
      await new Promise((resolve, reject) => {
       file.stream().pipe(writeStream).on('finish', resolve).on('error', reject);
      });
-    } else {
-     const writeStream = createWriteStream(outputPath);
-     await new Promise((resolve, reject) => {
-      file.stream().pipe(writeStream).on('finish', resolve).on('error', reject);
-     });
+     console.log(`Extracted: ${outputPath}`);
     }
+   } catch (error) {
+    console.error(`Failed to extract ${file.path}:`, error);
    }
   }
  }
