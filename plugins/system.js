@@ -41,27 +41,42 @@ bot(
   const currentTime = new Date().toLocaleTimeString('en-IN', { timeZone: TIME_ZONE });
   const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const currentDate = new Date().toLocaleDateString('en-IN', { timeZone: TIME_ZONE });
+
+  let contextInfo = {
+   externalAdReply: {
+    title: 'WhatsApp Bot',
+    body: 'Simple WhatsApp Bot',
+    thumbnail: path.join(__dirname, '../assets/images/thumb.jpg'),
+    mediaType: 1,
+    mediaUrl: 'https://github.com/AstroX10/whatsapp-bot',
+    sourceUrl: null,
+   },
+   isforwarded: true,
+   forwardingScore: 999,
+  };
+
   let wa = {
    key: { fromMe: false, participant: `0@s.whatsapp.net`, remoteJid: 'status@broadcast' },
    message: {
     contactMessage: {
-     displayName: `FX-BOT`,
-     vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:'FX-BOT'\nitem1.TEL;waid=${message.sender.split('@')[0]}:${message.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
+     displayName: `WhatsApp Bot`,
+     vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:'WhatsApp Bot'\nitem1.TEL;waid=${message.sender.split('@')[0]}:${message.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
     },
    },
   };
-  let menuText = `\`\`\`╭─ ғxᴏᴘʀɪsᴀ ᴍᴅ ───
-│ Prefix: ${prefix}
-│ User: ${pushName}
-│ Os: ${getOS()}
-│ Plugins: ${commands.length}
-│ Runtime: ${runtime(process.uptime())}
-│ Ram: ${getRAMUsage()}
-│ Time: ${currentTime}
-│ Day: ${currentDay}
-│ Date: ${currentDate}
-│ Version: ${require('../package.json').version}
-╰────────────────\`\`\`\n`;
+
+  let menuText = `\`\`\`╭─ WhatsApp Bot ───
+ │ Prefix: ${prefix}
+ │ User: ${pushName}
+ │ Os: ${getOS()}
+ │ Plugins: ${commands.length}
+ │ Runtime: ${runtime(process.uptime())}
+ │ Ram: ${getRAMUsage()}
+ │ Time: ${currentTime}
+ │ Day: ${currentDay}
+ │ Date: ${currentDate}
+ │ Version: ${require('../package.json').version}
+ ╰────────────────\`\`\`\n`;
 
   const categorized = commands
    .filter((cmd) => cmd.pattern && !cmd.dontAddCommandList)
@@ -79,7 +94,8 @@ bot(
    .forEach((category) => {
     menuText += tiny(`\n╭── *${category}* ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`);
    });
-  return client.sendMessage(message.jid, { text: menuText }, { quoted: wa });
+
+  return client.sendMessage(message.jid, { text: menuText, contextInfo }, { quoted: wa });
  }
 );
 
