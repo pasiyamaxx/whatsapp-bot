@@ -3,10 +3,9 @@ const config = require('../config');
 const ReplyMessage = require('./message_reply');
 const GroupManager = require('./group_manager');
 const UserProfileManager = require('./chats_manager');
-const { decodeJid, parsedJid, writeExifWebp, isUrl } = require('../utils');
-const { generateWAMessageFromContent, generateForwardMessageContent, getContentType } = require('baileys');
+const { decodeJid, createInteractiveMessage, parsedJid, writeExifWebp, isUrl } = require('../utils');
+const { generateWAMessageFromContent, generateWAMessage, generateForwardMessageContent, getContentType } = require('baileys');
 const fileType = require('file-type');
-const fs = require('fs').promises;
 
 class Message extends Base {
  constructor(client, data) {
@@ -21,6 +20,9 @@ class Message extends Base {
     if (typeof target.groupManager[prop] === 'function') {
      return (...args) => target.groupManager[prop](...args);
     }
+    return target[prop];
+   },
+   get(target, prop) {
     if (typeof target.chatManger[prop] === 'function') {
      return (...args) => target.chatManger[prop](...args);
     }
@@ -78,17 +80,44 @@ class Message extends Base {
   return super._patch(data);
  }
 
- async sendMessage(jid, content, opt = {}) {
-  return this.client.sendMessage(jid || this.jid, content, opt);
- }
+ async sendMessage(jid, content, opt = {}, type = 'text') {
+  const sendMedia = (type, content, opt = {}) => {
+   const isBuffer = Buffer.isBuffer(content);
+   const isUrl = typeof content === 'string' && content.startsWith('http');
+   return this.client.sendMessage(opt.jid || this.jid, { [type]: isBuffer ? content : isUrl ? { url: content } : content, ...opt });
+  };
 
- async sendMedia(type, content, opt = {}) {
-  const isBuffer = Buffer.isBuffer(content);
-  const isUrl = typeof content === 'string' && content.startsWith('http');
-  return this.client.sendMessage(opt.jid || this.jid, {
-   [type]: isBuffer ? content : isUrl ? { url: content } : content,
-   ...opt,
-  });
+  const sendFunc = {
+   text: () => this.client.sendMessage(jid || this.jid, { text: content, ...opt }),
+   image: () => sendMedia('image', content, opt),
+   video: () => sendMedia('video', content, opt),
+   audio: () => sendMedia('audio', content, opt),
+   template: async () => {
+    const msg = await generateWAMessage(jid || this.jid, content, opt);
+    return this.client.relayMessage(jid || this.jid, { viewOnceMessage: { message: { ...msg.message } } }, { messageId: msg.key.id });
+   },
+   interactive: async () => {
+    const msg = createInteractiveMessage(content);
+    return this.client.relayMessage(jid || this.jid, msg.message, { messageId: msg.key.id });
+   },
+   sticker: async () => {
+    const { data, mime } = await this.client.getFile(content);
+    if (mime === 'image/webp') {
+     const buff = await writeExifWebp(data, opt);
+     return this.client.sendMessage(jid || this.jid, { sticker: { url: buff }, ...opt }, opt);
+    }
+    return this.client.sendImageAsSticker(this.jid, content, opt);
+   },
+   document: () => sendMedia('document', content, { ...opt, mimetype: opt.mimetype || 'application/octet-stream' }),
+   pdf: () => sendMedia('document', content, { ...opt, mimetype: 'application/pdf' }),
+  };
+
+  return (
+   sendFunc[type.toLowerCase()] ||
+   (() => {
+    throw new Error('Unsupported message type');
+   })
+  )();
  }
 
  async reply(text, options = {}) {
@@ -109,124 +138,20 @@ class Message extends Base {
  }
 
  async send(content, options = {}) {
-  const jid = options.jid || this.jid;
+  const jid = this.jid || options.jid;
   if (!jid) throw new Error('JID is required to send a message.');
 
-  let messageContent = {};
-  let messageType = options.type;
-
-  if (!messageType) {
-   messageType = await this.detectType(content);
-  }
-
-  switch (messageType) {
-   case 'text':
-    messageContent = { text: content };
-    break;
-   case 'image':
-   case 'video':
-   case 'audio':
-   case 'document':
-    const mediaContent = await this.prepareMediaContent(content, messageType);
-    messageContent = { [messageType]: mediaContent };
-    break;
-   case 'sticker':
-    const stickerContent = await this.prepareStickerContent(content, options);
-    messageContent = { sticker: stickerContent };
-    break;
-   default:
-    throw new Error(`Unsupported message type: ${messageType}`);
-  }
-
-  const quotedMessage = options.quoted ? { quoted: options.quoted } : {};
-  const mergedOptions = {
-   ...quotedMessage,
-   ...options,
-  };
-
-  return this.client.sendMessage(jid, messageContent, mergedOptions);
- }
-
- async prepareMediaContent(content, type) {
-  if (Buffer.isBuffer(content)) {
-   return content;
-  } else if (isUrl(content)) {
-   return { url: content };
-  } else if (typeof content === 'string') {
-   const buffer = await fs.readFile(content);
-   return buffer;
-  }
-  throw new Error(`Invalid content for ${type}`);
- }
-
- async prepareStickerContent(content, options) {
-  const { data, mime } = await this.client.getFile(content);
-  if (mime === 'image/webp') {
-   const buff = await writeExifWebp(data, options);
-   return buff;
-  }
-  throw new Error('Unsupported sticker format');
- }
-
- async forward(jid, content, options = {}) {
-  if (options.readViewOnce) {
-   content = content?.ephemeralMessage?.message || content;
-   const viewOnceKey = Object.keys(content)[0];
-   delete content?.ignore;
-   delete content?.viewOnceMessage?.message?.[viewOnceKey]?.viewOnce;
-   content = { ...content?.viewOnceMessage?.message };
-  }
-
-  const forwardContent = generateForwardMessageContent(content, false);
-  const contentType = getContentType(forwardContent);
-
-  const forwardOptions = {
-   ...options,
-   contextInfo: {
-    ...(options.contextInfo || {}),
-    ...(content?.message[contentType]?.contextInfo || {}),
-   },
-  };
-
-  if (options.mentions) forwardOptions.contextInfo.mentionedJid = options.mentions;
-
-  return this.client.sendMessage(jid, forwardContent, forwardOptions);
- }
-
- async detectType(content) {
-  if (typeof content === 'string') {
-   if (isUrl(content)) {
-    const response = await fetch(content, { method: 'HEAD' });
-    const contentType = response.headers.get('content-type');
-    if (contentType.startsWith('image/')) return 'image';
-    if (contentType.startsWith('video/')) return 'video';
-    if (contentType.startsWith('audio/')) return 'audio';
-    return 'document';
-   }
+  const detectType = async (content) => {
+   if (typeof content === 'string') return isUrl(content) ? (await fetch(content, { method: 'HEAD' })).headers.get('content-type')?.split('/')[0] : 'text';
+   if (Buffer.isBuffer(content)) return (await fileType.fromBuffer(content))?.mime?.split('/')[0] || 'text';
    return 'text';
-  }
-  if (Buffer.isBuffer(content)) {
-   const { mime } = (await fileType.fromBuffer(content)) || {};
-   if (mime) {
-    const [type] = mime.split('/');
-    return ['image', 'video', 'audio'].includes(type) ? type : 'document';
-   }
-  }
-  return 'text';
- }
+  };
 
- async forwardMessage(jid, message, options = {}) {
-  if (!message || !message.message) {
-   throw new Error('Invalid message format for forwarding');
-  }
-  const m = generateWAMessageFromContent(jid, message, {
-   ...options,
-   userJid: this.client.user.id,
-  });
-  return this.client.sendMessage(jid, m.message, {
-   messageId: m.key.id,
-   ...options,
-  });
+  const type = options.type || (await detectType(content));
+  const quotedMsg = options.quoted ? { key: options.quoted.key, message: { [options.quoted.mtype]: options.quoted.message[options.quoted.mtype] } } : null;
+  const mergedOptions = { packname: 'ғxᴏᴘ-ᴍᴅ', author: 'ᴀsᴛʀᴏ', quoted: quotedMsg, ...options };
+
+  return this.sendMessage(jid, content, mergedOptions, type);
  }
 }
 
