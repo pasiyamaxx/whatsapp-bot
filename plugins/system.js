@@ -61,7 +61,7 @@ bot(
     menuText += tiny(`\n╭── *${category}* ────\n│ ${categorized[category].sort().join('\n│ ')}\n╰──────────────\n`);
    });
   const media = await images();
-  return message.send(media, { caption: menuText, quoted: message.data });
+  return message.send(media, { caption: menuText });
  }
 );
 
