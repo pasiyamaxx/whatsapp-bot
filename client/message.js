@@ -81,7 +81,7 @@ class Message extends Base {
   return super._patch(data);
  }
 
- async sendMessage(jid, content, opt = {}, type = 'text') {
+ async sendMessage(jid, content, opt = { quoted: this.data }, type = 'text') {
   const sendMedia = (type, content, opt = { quoted: this.data }) => {
    const isBuffer = Buffer.isBuffer(content);
    const isUrl = typeof content === 'string' && content.startsWith('http');
@@ -89,7 +89,7 @@ class Message extends Base {
   };
 
   const sendFunc = {
-   text: () => this.client.sendMessage(jid || this.jid, { text: content, quoted: this.data, ...opt }),
+   text: () => this.client.sendMessage(jid || this.jid, { text: content, ...opt }),
    image: () => sendMedia('image', content, opt),
    video: () => sendMedia('video', content, opt),
    audio: () => sendMedia('audio', content, opt),
