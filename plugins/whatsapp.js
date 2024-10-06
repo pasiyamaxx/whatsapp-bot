@@ -142,21 +142,8 @@ bot(
   type: 'whatsapp',
  },
  async (message, match, m, client) => {
-  if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.reply('_Reply to a status message containing an image, video, or audio_');
-  return await message.copyNForward(message.user, m.quoted);
- }
-);
-
-bot(
- {
-  pattern: 'save ?(.*)',
-  fromMe: true,
-  desc: 'Saves WhatsApp Status',
-  type: 'whatsapp',
- },
- async (message, match, m, client) => {
   if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.sendReply('_Reply Status_');
-  await message.forward(message.user, m.quoted.message);
+  await message.copyNForward(message.user, m.quoted.message);
  }
 );
 
