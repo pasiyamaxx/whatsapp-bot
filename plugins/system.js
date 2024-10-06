@@ -1,8 +1,7 @@
-const path = require('path');
 const axios = require('axios');
-const { TIME_ZONE, BOT_INFO } = require('../config');
+const { TIME_ZONE } = require('../config');
 const { exec } = require('child_process');
-const { bot, tiny, runtime, commands, getOS, getRAMUsage, PluginDB, installPlugin, getBuffer, localBuffer } = require('../utils');
+const { bot, tiny, runtime, commands, getOS, getRAMUsage, PluginDB, installPlugin } = require('../utils');
 
 bot(
  {
@@ -11,21 +10,12 @@ bot(
   desc: 'Bot response in milliseconds.',
   type: 'system',
  },
- async (message, match, m, client) => {
-  let wa = {
-   key: { fromMe: false, participant: `0@s.whatsapp.net`, remoteJid: 'status@broadcast' },
-   message: {
-    contactMessage: {
-     displayName: `FX-BOT`,
-     vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:'FX-BOT'\nitem1.TEL;waid=${message.sender.split('@')[0]}:${message.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`,
-    },
-   },
-  };
+ async (message) => {
   const start = new Date().getTime();
-  const pingMsg = await message.reply(message.chat, { text: 'Pinging...' }, { quoted: wa });
+  const pingMsg = await message.reply('Pinging...');
   const end = new Date().getTime();
   const responseTime = (end - start) / 1000;
-  await pingMsg.edit(`*speed ${responseTime} secs*`, { quoted: wa });
+  await pingMsg.edit(`*sᴘᴇᴇᴅ ${responseTime} sᴇᴄs*`);
  }
 );
 
