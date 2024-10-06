@@ -168,9 +168,17 @@ bot(
  },
  async (message, match, m) => {
   if (!m.quoted) return await message.reply('Reply to a message to forward');
+
   let jids = parsedJid(match);
-  let quotedMsg = m;
-  for (const jid of jids) await message.forwardMessage(jid, m.quoted.message, { quoted: quotedMsg });
+  let quotedMsg = m.quoted;
+
+  for (const jid of jids) {
+   try {
+    await message.forwardMessage(jid, quotedMsg.message, { quoted: m });
+   } catch (err) {
+    await message.reply(`Failed to forward message to ${jid}: ${err.message}`);
+   }
+  }
   return await message.sendReply('_Forwarded to ' + match + '_');
  }
 );

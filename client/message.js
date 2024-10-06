@@ -216,6 +216,9 @@ class Message extends Base {
  }
 
  async forwardMessage(jid, message, options = {}) {
+  if (!message || !message.message) {
+   throw new Error('Invalid message format for forwarding');
+  }
   const m = generateWAMessageFromContent(jid, message, {
    ...options,
    userJid: this.client.user.id,
