@@ -134,7 +134,7 @@ class Message extends Base {
   return this.client.sendMessage(this.jid, { react: { text: emoji, key: this.key } });
  }
 
- async send(content, options = {}) {
+ async send(content, options = { quoted: this.data }) {
   const jid = this.jid || options.jid;
   if (!jid) throw new Error('JID is required to send a message.');
 
