@@ -1,9 +1,8 @@
 const { get } = require('axios');
 const { ensureDir, createWriteStream, remove } = require('fs-extra');
 const { join } = require('path');
-const { Open } = require('unzipper');
+const unzipper = require('unzipper'); // Ensure you have this imported
 const config = require('../config');
-const fs = require('fs');
 
 class SessionManager {
  constructor() {
@@ -37,22 +36,26 @@ class SessionManager {
  }
 
  async extractSession() {
-  const directoryEntries = await Open.file(this.zipPath);
-  const files = await directoryEntries.list();
-  for (const file of files) {
-   const outputPath = join(this.dirPath, file.path);
-   const writeStream = createWriteStream(outputPath);
-   try {
-    if (file.type === 'File') {
-     await new Promise((resolve, reject) => {
-      file.stream().pipe(writeStream).on('finish', resolve).on('error', reject);
-     });
-     console.log(`Extracted: ${outputPath}`);
-    }
-   } catch (error) {
-    console.error(`Failed to extract ${file.path}:`, error);
-   }
-  }
+  return new Promise((resolve, reject) => {
+   fs
+    .createReadStream(this.zipPath)
+    .pipe(unzipper.Parse())
+    .on('entry', async (entry) => {
+     const outputPath = join(this.dirPath, entry.path);
+     const writeStream = createWriteStream(outputPath);
+     entry
+      .pipe(writeStream)
+      .on('finish', () => {
+       console.log(`Extracted: ${outputPath}`);
+      })
+      .on('error', (error) => {
+       console.error(`Failed to extract ${entry.path}:`, error);
+       reject(error);
+      });
+    })
+    .on('close', resolve)
+    .on('error', reject);
+  });
  }
 
  async cleanup() {
