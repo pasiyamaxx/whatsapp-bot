@@ -3,29 +3,19 @@ const config = require('../config');
 const ReplyMessage = require('./message_reply');
 const GroupManager = require('./group_manager');
 const UserProfileManager = require('./chats_manager');
-const { decodeJid, createInteractiveMessage, parsedJid, writeExifWebp, isUrl } = require('../utils');
+const { decodeJid, createInteractiveMessage, parsedJid, writeExifWebp } = require('../utils');
 const { generateWAMessageFromContent, generateWAMessage, generateForwardMessageContent, getContentType } = require('baileys');
-const fileType = require('file-type');
 
 class Message extends Base {
  constructor(client, data) {
   super(client);
   if (data) this._patch(data);
-
   this.groupManager = new GroupManager(this.client, data);
-  this.chatManger = new UserProfileManager(this.client, data);
-
+  this.chatManager = new UserProfileManager(this.client, data);
   return new Proxy(this, {
-   get(target, prop) {
-    if (typeof target.groupManager[prop] === 'function') {
-     return (...args) => target.groupManager[prop](...args);
-    }
-    return target[prop];
-   },
-   get(target, prop) {
-    if (typeof target.chatManger[prop] === 'function') {
-     return (...args) => target.chatManger[prop](...args);
-    }
+   get: (target, prop) => {
+    if (typeof target.groupManager[prop] === 'function') return (...args) => target.groupManager[prop](...args);
+    if (typeof target.chatManager[prop] === 'function') return (...args) => target.chatManager[prop](...args);
     return target[prop];
    },
   });
@@ -58,31 +48,18 @@ class Message extends Base {
    isOwner: key.fromMe,
    messageType: Object.keys(message)[0],
    isViewOnce: Boolean(message.viewOnceMessage),
+   reply_message: quoted && !message.buttonsResponseMessage ? new ReplyMessage(this.client, contextInfo, quoted) : false,
+   sticker: Boolean(message.stickerMessage),
+   video: message.videoMessage,
+   image: message.imageMessage,
   });
-
-  if (quoted && !message.buttonsResponseMessage) {
-   this.reply_message = new ReplyMessage(this.client, contextInfo, quoted);
-   Object.assign(this.reply_message, {
-    type: quoted.type || 'extendedTextMessage',
-    mtype: quoted.mtype,
-    key: quoted.key,
-    mention: quoted.message.extendedTextMessage?.contextInfo?.mentionedJid || false,
-    sender: contextInfo?.participant || quoted.key.remoteJid,
-    senderNumber: (contextInfo?.participant || quoted.key.remoteJid)?.split('@')[0] || false,
-   });
-  } else {
-   this.reply_message = false;
-  }
-  if (message.stickerMessage) this.sticker = true;
-  if (message.videoMessage) this.video = message.videoMessage;
-  if (message.imageMessage) this.image = message.imageMessage;
 
   return super._patch(data);
  }
 
  async sendMessage(jid, content, opt = {}, type = 'text') {
-  const sendFunc = {
-   text: () => this.client.sendMessage(jid || this.jid || this.jid, { text: content, ...opt }),
+  const sendFunctions = {
+   text: () => this.client.sendMessage(jid || this.jid, { text: content, ...opt }),
    image: () => this.sendMedia('image', content, opt),
    video: () => this.sendMedia('video', content, opt),
    audio: () => this.sendMedia('audio', content, opt),
@@ -106,29 +83,19 @@ class Message extends Base {
    pdf: () => this.sendMedia('document', content, { ...opt, mimetype: 'application/pdf' }),
   };
 
-  return (
-   sendFunc[type.toLowerCase()] ||
-   (() => {
-    throw new Error('Unsupported message type');
-   })
-  )();
+  const sendFunc = sendFunctions[type.toLowerCase()];
+  if (!sendFunc) throw new Error('Unsupported message type');
+  return sendFunc();
  }
+
  async sendMedia(type, content, opt = {}) {
-  const isBuffer = Buffer.isBuffer(content);
-  const isUrl = typeof content === 'string' && content.startsWith('http');
-  return this.client.sendMessage(opt.jid || this.jid, {
-   [type]: isBuffer ? content : isUrl ? { url: content } : content,
-   ...opt,
-  });
+  const mediaContent = Buffer.isBuffer(content) ? content : typeof content === 'string' && content.startsWith('http') ? { url: content } : content;
+  return this.client.sendMessage(opt.jid || this.jid, { [type]: mediaContent, ...opt });
  }
 
  async reply(text, options = {}) {
   const message = await this.client.sendMessage(this.jid, { text }, { quoted: this.data, ...options });
   return new Message(this.client, message);
- }
-
- async sendReply(text, options = {}) {
-  return this.reply(text, options);
  }
 
  async edit(text, opt = {}) {
@@ -139,30 +106,6 @@ class Message extends Base {
   return this.client.sendMessage(this.jid, { react: { text: emoji, key: this.key } });
  }
 
- async send(content, options = {}) {
-  const jid = this.jid || options.jid;
-  if (!jid) throw new Error('JID is required to send a message.');
-  const type = options.type || (await this.detectType(content));
-
-  let quotedMsg = null;
-  if (options.quoted) {
-   quotedMsg = {
-    key: options.quoted.key,
-    message: {
-     [options.quoted.mtype]: options.quoted.message[options.quoted.mtype],
-    },
-   };
-  }
-
-  const mergedOptions = {
-   packname: 'ғxᴏᴘ-ᴍᴅ',
-   author: 'ᴀsᴛʀᴏ',
-   quoted: quotedMsg,
-   ...options,
-  };
-
-  return this.sendMessage(jid, content, mergedOptions, type);
- }
  async forward(jid, content, options = {}) {
   if (options.readViewOnce) {
    content = content?.ephemeralMessage?.message || content;
@@ -174,7 +117,6 @@ class Message extends Base {
 
   const forwardContent = generateForwardMessageContent(content, false);
   const contentType = getContentType(forwardContent);
-
   const forwardOptions = {
    ...options,
    contextInfo: {
@@ -187,28 +129,6 @@ class Message extends Base {
 
   const waMessage = generateWAMessageFromContent(jid, forwardContent, forwardOptions);
   return this.client.relayMessage(jid, waMessage.message, { messageId: waMessage.key.id });
- }
-
- async detectType(content) {
-  if (typeof content === 'string') {
-   return isUrl(content) ? (await fetch(content, { method: 'HEAD' })).headers.get('content-type')?.split('/')[0] : 'text';
-  }
-  if (Buffer.isBuffer(content)) {
-   const { mime } = (await fileType.fromBuffer(content)) || {};
-   return mime?.split('/')[0] || 'text';
-  }
-  return 'text';
- }
- async forwardMessage(jid, message, options = {}) {
-  const m = generateWAMessageFromContent(jid, message, {
-   ...options,
-   userJid: this.client.user.id,
-  });
-  await this.client.relayMessage(jid, m.message, {
-   messageId: m.key.id,
-   ...options,
-  });
-  return m;
  }
 }
 
