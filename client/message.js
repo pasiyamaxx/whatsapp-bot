@@ -234,7 +234,7 @@ class Message extends Base {
       }
     : {}
   );
-  await this.relayMessage(jid, waMessage.message, { messageId: waMessage.key.id });
+  await this.client.relayMessage(jid, waMessage.message, { messageId: waMessage.key.id });
   return waMessage;
  }
 }
