@@ -190,7 +190,7 @@ class Message extends Base {
    ...forwardContent[contentType],
    ...forwardOptions,
   });
-  return await client.relayMessage(jid, waMessage.message, {
+  return await this.client.relayMessage(jid, waMessage.message, {
    messageId: waMessage.key.id,
   });
  }
