@@ -11,6 +11,7 @@ const { default: fetch } = require('node-fetch');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
+const PDFDocument = require('pdfkit')
 
 /**
  *
