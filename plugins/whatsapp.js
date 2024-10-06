@@ -151,7 +151,7 @@ bot(
  {
   pattern: 'forward ?(.*)',
   fromMe: true,
-  desc: 'Forwards the replied message (any type)',
+  desc: 'Forwards the replied message as a quote (any type)',
   type: 'whatsapp',
  },
  async (message, match, m) => {
@@ -159,14 +159,21 @@ bot(
   const jids = parsedJid(match);
 
   for (const jid of jids) {
-   try {
-    // Use the message object to call copyNForward
-    await message.copyNForward(jid, m.quoted.fakeObj);
-    await message.reply(`Message forwarded to ${jid}`);
-   } catch (error) {
-    console.error(`Error forwarding to ${jid}:`, error);
-    await message.reply(`Failed to forward message to ${jid}`);
-   }
+   const options = {
+    quoted: m.quoted,
+    contextInfo: {
+     isForwarded: true,
+     forwardingScore: 1,
+     quotedMessage: m.quoted.message,
+    },
+   };
+   const forwardMessage = {
+    key: m.quoted.key,
+    message: m.quoted.message,
+    messageTimestamp: m.quoted.messageTimestamp,
+   };
+   await message.copyNForward(jid, forwardMessage, false, options);
+   await message.reply(`Message forwarded as a quote to ${jid}`);
   }
  }
 );
