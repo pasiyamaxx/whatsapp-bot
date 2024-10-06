@@ -208,7 +208,7 @@ class Message extends Base {
    };
   }
 
-  let content = await this.generateForwardMessageContent(message, forceForward);
+  let content = await generateForwardMessageContent(message, forceForward);
   let ctype = Object.keys(content)[0];
   let context = {};
   if (ctype != 'conversation') context = message.message[ctype].contextInfo;
@@ -216,7 +216,7 @@ class Message extends Base {
    ...context,
    ...content[ctype].contextInfo,
   };
-  const waMessage = await this.generateWAMessageFromContent(
+  const waMessage = await generateWAMessageFromContent(
    jid,
    content,
    options
