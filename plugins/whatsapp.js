@@ -143,7 +143,23 @@ bot(
  },
  async (message, match, m, client) => {
   if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.sendReply('_Reply Status_');
-  await message.copyNForward(message.user, m.quoted.message, { quoted: m.quoted.message });
+  await message.copyNForward(message.user, m.quoted.message, { quoted: message.data });
+ }
+);
+
+Module(
+ {
+  pattern: 'forward ?(.*)',
+  fromMe: false,
+  desc: 'Forwards the replied message (any type)',
+  type: 'whatsapp',
+ },
+ async (message, match, m) => {
+  if (!m.quoted) return await message.reply('Reply to a message to forward');
+  const jids = parsedJid(match);
+  for (const jid of jids) {
+   await message.copyNForward(jid, m.quoted.message, { quoted: m.quoted });
+  }
  }
 );
 
