@@ -158,7 +158,7 @@ bot(
    return await message.reply('_Reply Status_');
   }
   const quotedMessage = m.quoted ? m.quoted : message.reply_message;
-  return await message.forwardlite(message.user, quotedMessage, { quoted: quotedMessage });
+  return await message.forwardlite(message.user, { quotedMessage, quoted: quotedMessage });
  }
 );
 
