@@ -148,3 +148,41 @@ bot(
   );
  }
 );
+
+bot(
+ {
+  pattern: 'ytv ?(.*)',
+  fromMe: false,
+  desc: 'Downloads Youtube Videos From URL',
+  type: 'download',
+ },
+ async (message, match, client) => {
+  if (!match || !/^(https:\/\/)?(www\.)?(youtube\.com|youtu\.be)/.test(match)) {
+   return await message.reply('ɴᴇᴇᴅ ʏᴛ ᴜʀʟ');
+  }
+  const msgdl = await message.reply('_Downloading ' + match + '_');
+  const res = await getJson('https://api.guruapi.tech/ytdl/ytmp4?url=' + match);
+  const buff = await getBuffer(res.video_url);
+  await msgdl.edit(`_Successfully Downloaded ${res.title}_`);
+  return await message.send(buff, { caption: res.description });
+ }
+);
+
+bot(
+ {
+  pattern: 'yta ?(.*)',
+  fromeMe: false,
+  desc: 'Downloads Youtube Audio From URL',
+  type: 'download',
+ },
+ async (message, match, client) => {
+  if (!match || !/^(https:\/\/)?(www\.)?(youtube\.com|youtu\.be)/.test(match)) {
+   return await message.reply('ɴᴇᴇᴅ ʏᴛ ᴜʀʟ');
+  }
+  const msgdl = await message.reply('_Downloading ' + match + '_');
+  const res = await getJson('https://api.guruapi.tech/ytdl/ytmp4?url=' + match);
+  const buff = await getBuffer(res.audio_url);
+  await msgdl.edit(`_Successfully Downloaded ${res.title}\n${res.author}_`);
+  return await message.send(buff);
+ }
+);

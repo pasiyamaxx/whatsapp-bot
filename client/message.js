@@ -196,46 +196,11 @@ class Message extends Base {
   });
  }
 
- async copyNForward(jid, message, forceForward = false, options = {}) {
-  let vtype;
-  if (options.readViewOnce) {
-   message.message = message.message && message.message.ephemeralMessage && message.message.ephemeralMessage.message ? message.message.ephemeralMessage.message : message.message || undefined;
-   vtype = Object.keys(message.message.viewOnceMessage.message)[0];
-   delete (message.message && message.message.ignore ? message.message.ignore : message.message || undefined);
-   delete message.message.viewOnceMessage.message[vtype].viewOnce;
-   message.message = {
-    ...message.message.viewOnceMessage.message,
-   };
-  }
-
-  let content = await generateForwardMessageContent(message, forceForward);
-  let ctype = Object.keys(content)[0];
-  let context = {};
-  if (ctype != 'conversation') context = message.message[ctype].contextInfo;
-  content[ctype].contextInfo = {
-   ...context,
-   ...content[ctype].contextInfo,
-  };
-  const waMessage = await generateWAMessageFromContent(
-   jid,
-   content,
-   options
-    ? {
-       ...content[ctype],
-       ...options,
-       ...(options.contextInfo
-        ? {
-           contextInfo: {
-            ...content[ctype].contextInfo,
-            ...options.contextInfo,
-           },
-          }
-        : {}),
-      }
-    : {}
-  );
-  await this.client.relayMessage(jid, waMessage.message, { messageId: waMessage.key.id });
-  return waMessage;
+ async copyNForward(jid, message, options = {}) {
+  const msg = generateWAMessageFromContent(jid, message, { ...options, userJid: this.client.user.id });
+  msg.message.contextInfo = options.contextInfo || msg.message.contextInfo;
+  await this.client.relayMessage(jid, msg.message, { messageId: msg.key.id, ...options });
+  return msg;
  }
 }
 

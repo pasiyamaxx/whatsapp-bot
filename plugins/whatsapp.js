@@ -149,32 +149,14 @@ bot(
 
 bot(
  {
-  pattern: 'forward ?(.*)',
+  pattern: 'save ?(.*)',
   fromMe: true,
-  desc: 'Forwards the replied message as a quote (any type)',
+  desc: 'Saves WhatsApp Status',
   type: 'whatsapp',
  },
- async (message, match, m) => {
-  if (!m.quoted) return await message.reply('Reply to a message to forward');
-  const jids = parsedJid(match);
-
-  for (const jid of jids) {
-   const options = {
-    quoted: m.quoted,
-    contextInfo: {
-     isForwarded: true,
-     forwardingScore: 1,
-     quotedMessage: m.quoted.message,
-    },
-   };
-   const forwardMessage = {
-    key: m.quoted.key,
-    message: m.quoted.message,
-    messageTimestamp: m.quoted.messageTimestamp,
-   };
-   await message.copyNForward(jid, forwardMessage, false, options);
-   await message.reply(`Message forwarded as a quote to ${jid}`);
-  }
+ async (message, match, m, client) => {
+  if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.sendReply('_Reply Status_');
+  await message.forward(message.user, m.quoted.message);
  }
 );
 
