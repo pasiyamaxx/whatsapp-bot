@@ -42,3 +42,7 @@ This project is licensed under the MIT License. You are free to use, modify, and
 ### FOSSA TEST
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAstroX10%2Fwhatsapp-bot.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2FAstroX10%2Fwhatsapp-bot?ref=badge_shield&issueType=security)
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAstroX10%2Fwhatsapp-bot.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FAstroX10%2Fwhatsapp-bot?ref=badge_shield&issueType=license)
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAstroX10%2Fwhatsapp-bot.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FAstroX10%2Fwhatsapp-bot?ref=badge_large&issueType=license)
