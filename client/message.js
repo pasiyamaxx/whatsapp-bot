@@ -196,27 +196,16 @@ class Message extends Base {
   });
  }
  async copyNForward(jid, content, options = {}) {
+  if (options.readViewOnce) {
+   content = content?.ephemeralMessage?.message || content;
+   const viewOnceKey = Object.keys(content)[0];
+   delete content?.viewOnceMessage?.message?.[viewOnceKey]?.viewOnce;
+   content = { ...content?.viewOnceMessage?.message };
+  }
   const forwardContent = generateForwardMessageContent(content, false);
   const contentType = getContentType(forwardContent);
-  const contextInfo = {
-   ...options.contextInfo,
-   ...(options.mentions ? { mentionedJid: options.mentions } : {}),
-  };
-  if (contentType !== 'conversation') {
-   contextInfo = {
-    ...contextInfo,
-    ...forwardContent[contentType]?.contextInfo,
-   };
-  }
-  forwardContent[contentType].contextInfo = contextInfo;
-  const waMessage = generateWAMessageFromContent(jid, forwardContent, {
-   ...forwardContent[contentType],
-   ...contextInfo,
-  });
-
-  return await client.relayMessage(jid, waMessage.message, {
-   messageId: waMessage.key.id,
-  });
+  const waMessage = generateWAMessageFromContent(jid, contentType, { quoted: options.quoted });
+  return await this.client.relayMessage(jid, waMessage.message, { messageId: waMessage.key.id });
  }
 }
 
