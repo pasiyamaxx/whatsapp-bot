@@ -197,7 +197,7 @@ class Message extends Base {
  }
  async copyNForward(jid, message, options = {}) {
   const msg = generateWAMessageFromContent(jid, message, { ...options });
-  await client.relayMessage(jid, msg.message, { messageId: msg.key.id, ...options });
+  await this.client.relayMessage(jid, msg.message, { messageId: msg.key.id, ...options });
   return msg;
  }
 }
