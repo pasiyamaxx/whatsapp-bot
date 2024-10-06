@@ -129,7 +129,7 @@ bot(
   if (!msg) return await message.reply('_Message not found maybe bot might not be running at that time_');
   msg = await serialize(JSON.parse(JSON.stringify(msg.message)), message.client);
   if (!msg.quoted) return await message.reply('No quoted message found');
-  await message.fdMSg(message.jid, msg.quoted.message);
+  await message.forwardMessage(message.jid, msg.quoted.message);
  }
 );
 
@@ -142,7 +142,7 @@ bot(
  },
  async (message, match, m, client) => {
   if (!message.reply_message) return await message.sendReply('_Reply Message_');
-  return await message.fdMsg(message.user, m.quoted);
+  return await message.forwardMessage(message.user, m.quoted);
  }
 );
 
@@ -155,7 +155,7 @@ bot(
  },
  async (message, match, m, client) => {
   if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.sendReply('_Reply Status_');
-  return await message.fdMsg(message.user, m.quoted);
+  return await message.forwardMessage(message.user, m.quoted);
  }
 );
 
@@ -170,7 +170,7 @@ bot(
   if (!m.quoted) return await message.reply('Reply to a message to forward');
   let jids = parsedJid(match);
   let quotedMsg = m;
-  for (const jid of jids) await message.fdMSg(jid, m.quoted.message, { quoted: quotedMsg });
+  for (const jid of jids) await message.forwardMessage(jid, m.quoted.message, { quoted: quotedMsg });
   return await message.sendReply('_Forwarded to ' + match + '_');
  }
 );
