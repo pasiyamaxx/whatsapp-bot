@@ -13,7 +13,7 @@ bot(
   let buff = await m.quoted.copyNSave();
   const media = await localBuffer(buff);
   await message.reply('_Message Saved_');
-  return await message.send(media, { jid: message.user });
+  return await message.send(media, { jid: message.user, quoted: m.quoted });
  }
 );
 
@@ -42,7 +42,7 @@ bot(
  async (message, match) => {
   if (!match) return await message.reply('_Enter name_');
   await message.updateName(match);
-  return await message.reply(`_Username Updated : ${match}_`);
+  return await message.reply(`_Your New name is : ${match}_`);
  }
 );
 
@@ -62,7 +62,7 @@ bot(
     mentions: [jid],
    });
   } else {
-   await message.reply('_Blocked_');
+   await client.sendMessage(message.jid, { text: '_Blocked_' });
    return await message.block(message.jid);
   }
  }
@@ -75,7 +75,7 @@ bot(
   desc: 'Unblock a person',
   type: 'whatsapp',
  },
- async (message, match) => {
+ async (message, match, m, client) => {
   if (message.isGroup) {
    let jid = message.mention[0] || message.reply_message.jid;
    if (!jid) return await message.reply('_Reply to a person or mention_');
@@ -130,19 +130,6 @@ bot(
   msg = await serialize(JSON.parse(JSON.stringify(msg.message)), message.client);
   if (!msg.quoted) return await message.reply('No quoted message found');
   await message.forward(message.jid, msg.quoted.message);
- }
-);
-
-bot(
- {
-  pattern: 'sms ?(.*)',
-  fromMe: true,
-  desc: 'Saves Message to Dm',
-  type: 'whatsapp',
- },
- async (message, match, m, client) => {
-  if (!message.reply_message) return await message.reply('_Reply Message_');
-  return await message.forwardlite(message.user, m.quoted, { quoted: m.quoted });
  }
 );
 

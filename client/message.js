@@ -194,16 +194,28 @@ class Message extends Base {
    messageId: waMessage.key.id,
   });
  }
- async forwardlite(jid, message, options = {}) {
-  const m = generateWAMessageFromContent(jid, message, {
-   ...options,
-   userJid: this.client.user.id,
+ async copyNForward(jid, content, options = {}) {
+  const forwardContent = generateForwardMessageContent(content, false);
+  const contentType = getContentType(forwardContent);
+  const contextInfo = {
+   ...options.contextInfo,
+   ...(options.mentions ? { mentionedJid: options.mentions } : {}),
+  };
+  if (contentType !== 'conversation') {
+   contextInfo = {
+    ...contextInfo,
+    ...forwardContent[contentType]?.contextInfo,
+   };
+  }
+  forwardContent[contentType].contextInfo = contextInfo;
+  const waMessage = generateWAMessageFromContent(jid, forwardContent, {
+   ...forwardContent[contentType],
+   ...contextInfo,
   });
-  await this.client.relayMessage(jid, m.message, {
-   messageId: m.key.id,
-   ...options,
+
+  return await client.relayMessage(jid, waMessage.message, {
+   messageId: waMessage.key.id,
   });
-  return m;
  }
 }
 
