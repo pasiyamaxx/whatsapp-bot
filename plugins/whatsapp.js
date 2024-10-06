@@ -143,7 +143,7 @@ bot(
  async (message, match, m, client) => {
   if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.reply('_Reply Status_');
   let quotedMsg = m.quoted;
-  return await message.forwardlite(message.user, m.quoted, { quoted: quotedMsg });
+  return await message.copyNForward(message.user, m.quoted, { quoted: quotedMsg });
  }
 );
 
@@ -158,7 +158,7 @@ bot(
   if (!m.quoted) return await message.reply('Reply to a message to forward');
   const jids = parsedJid(match);
   for (const jid of jids) {
-   await message.forwardlite(jid, m.quoted, { quoted: m.quoted });
+   await message.copyNForward(jid, m.quoted, { quoted: m.quoted });
   }
  }
 );
