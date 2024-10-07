@@ -54,7 +54,7 @@ bot(
   desc: 'Block a person',
   type: 'whatsapp',
  },
- async (message, match) => {
+ async (message, match, m, client) => {
   if (message.isGroup) {
    let jid = message.mention[0] || message.reply_message.jid;
    if (!jid) return await message.reply('_Reply to a person or mention_');
