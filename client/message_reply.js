@@ -17,9 +17,9 @@ class ReplyMessage extends Base {
   this.key = key;
   this.id = stanzaId;
   this.isBaileys = (this.id && this.id.startsWith('BAE5')) || (this.id && this.id.length === 16);
-  this.jid = participant;
-  this.sudo = config.SUDO.split(',').includes(this.jid.split('@')[0]);
-  this.fromMe = parsedJid(this.client.user.jid)[0] === parsedJid(this.jid)[0];
+  this.jid = participant || '';
+  this.sudo = this.jid ? config.SUDO.split(',').includes(this.jid.split('@')[0]) : false;
+  this.fromMe = this.jid ? parsedJid(this.client.user.jid)[0] === parsedJid(this.jid)[0] : false;
 
   if (quotedMessage) this.processQuotedMessage(quotedMessage);
 
@@ -27,6 +27,8 @@ class ReplyMessage extends Base {
  }
 
  processQuotedMessage(quotedMessage) {
+  if (!quotedMessage) return;
+
   const [type] = Object.keys(quotedMessage);
   const message = quotedMessage[type];
 
@@ -38,8 +40,8 @@ class ReplyMessage extends Base {
    this.sticker = message;
   } else {
    this.mimetype = message?.mimetype || type;
-   const [mime] = this.mimetype.split('/');
-   this[mime] = message;
+   const [mime] = (this.mimetype || '').split('/');
+   if (mime) this[mime] = message;
   }
  }
 
@@ -48,15 +50,17 @@ class ReplyMessage extends Base {
  }
 
  async downloadMediaMessage() {
+  if (!this.m || !this.m.quoted) throw new Error('No quoted message');
   const buff = await this.m.quoted.download();
   const { ext } = await fileType.fromBuffer(buff);
-  const filePath = path.join(os.tmpdir(), `downloaded_media${ext}`);
-  await fs.writeFile(filePath, buff);
-  return filePath;
+  const fileBuffer = path.join(os.tmpdir(), `downloaded_media${ext}`);
+  await fs.writeFile(fileBuffer, buff);
+  return fileBuffer;
  }
+
  async downloadAndSaveMedia() {
+  if (!this.m || !this.m.quoted) throw new Error('No quoted message');
   const filePath = await this.m.quoted.copyNSave();
-  console.log(filePath);
   return filePath;
  }
 }

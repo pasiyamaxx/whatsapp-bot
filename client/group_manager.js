@@ -6,6 +6,7 @@ class GroupManager extends Base {
  constructor(client, data) {
   super(client);
   if (data) this._patch(data);
+  this.metadata = null;
  }
 
  _patch(data) {
@@ -28,46 +29,30 @@ class GroupManager extends Base {
   return super._patch(data);
  }
 
- /**
-  * @param {string} action
-  * @param {string|string[]} participants
-  */
+ async ensureMetadata() {
+  if (!this.metadata) {
+   this.metadata = await this.fetchMetadata();
+  }
+  return this.metadata;
+ }
+
  async manageParticipants(action, participants) {
   return this.client.groupParticipantsUpdate(this.jid, Array.isArray(participants) ? participants : [participants], action);
  }
 
- /**
-  * @param {string|string[]} participants
-  */
  async add(participants) {
   return this.manageParticipants('add', participants);
  }
-
- /**
-  * @param {string|string[]} participants
-  */
  async remove(participants) {
   return this.manageParticipants('remove', participants);
  }
-
- /**
-  * @param {string|string[]} participants
-  */
  async promote(participants) {
   return this.manageParticipants('promote', participants);
  }
-
- /**
-  * @param {string|string[]} participants
-  */
  async demote(participants) {
   return this.manageParticipants('demote', participants);
  }
 
- /**
-  * @param {string} name
-  * @param {string[]} [members=[]]
-  */
  async createGroup(name, members = []) {
   return this.client.groupCreate(name, members);
  }
@@ -75,53 +60,27 @@ class GroupManager extends Base {
  async leave() {
   return this.client.groupLeave(this.jid);
  }
-
- /**
-  * @param {string} code
-  */
  async joinByInvite(code) {
   return this.client.groupAcceptInvite(code);
  }
-
- /**
-  * @param {string} groupJid
-  * @param {string} message
-  */
  async joinByInviteV4(groupJid, message) {
   return this.client.groupAcceptInviteV4(groupJid, message);
  }
 
- /**
-  * @param {string} name
-  */
  async updateName(name) {
   return this.client.groupUpdateSubject(this.jid, name);
  }
-
- /**
-  * @param {string} description
-  */
  async updateDescription(description) {
   return this.client.groupUpdateDescription(this.jid, description);
  }
 
- /**
-  * @param {string} image
-  */
  async updatePicture(jid, pp) {
   return this.client.updateProfilePicture(jid || this.jid, Buffer.isBuffer(pp) ? pp : { url: pp });
  }
 
- /**
-  * @param {object} settings
-  */
  async updateSettings(settings) {
   return this.client.groupSettingUpdate(this.jid, settings);
  }
-
- /**
-  * @param {number} duration
-  */
  async setEphemeral(duration) {
   return this.client.groupToggleEphemeral(this.jid, duration);
  }
@@ -129,129 +88,65 @@ class GroupManager extends Base {
  async getInviteCode() {
   return this.client.groupInviteCode(this.jid);
  }
-
  async revokeInvite() {
   return this.client.groupRevokeInvite(this.jid);
  }
-
- /**
-  * @param {string} code
-  */
  async getInviteInfo(code) {
   return this.client.groupGetInviteInfo(code);
  }
 
- /**
-  * @param {string} inviteCode
-  * @param {string} inviteMessage
-  * @param {number} expiration
-  */
  async sendInvite(inviteCode, inviteMessage, expiration) {
   return this.client.groupInviteMessage(this.jid, inviteCode, inviteMessage, expiration);
  }
 
  async fetchMetadata() {
-  return this.client.groupMetadata(this.jid);
+  this.metadata = await this.client.groupMetadata(this.jid);
+  return this.metadata;
  }
 
  async fetchParticipants() {
-  const metadata = await this.fetchMetadata();
-  return metadata.participants;
+  await this.ensureMetadata();
+  return this.metadata.participants;
  }
 
  async fetchMemberCount() {
-  const metadata = await this.fetchMetadata();
-  return metadata.participants.length;
+  await this.ensureMetadata();
+  return this.metadata.participants.length;
  }
 
- /**
-  * @param {string} jid
-  */
  async isMember(jid) {
   const participants = await this.fetchParticipants();
   return participants.some((participant) => participant.id === jid);
  }
 
- /**
-  * @param {string} jid
-  */
  async isAdmin(jid) {
   const participants = await this.fetchParticipants();
   const participant = participants.find((p) => p.id === jid);
   return participant && (participant.admin === 'admin' || participant.admin === 'superadmin');
  }
 
- /**
-  * @param {number} duration
-  */
  async setDisappearingMessages(duration) {
-  return this.client.groupSettingUpdate(this.jid, { disappearingMessages: duration });
+  return this.updateSettings({ disappearingMessages: duration });
  }
 
- /**
-  * @param {boolean} isRestricted
-  */
  async setRestrict(isRestricted) {
-  return this.client.groupSettingUpdate(this.jid, { restrict: isRestricted });
+  return this.updateSettings({ restrict: isRestricted });
  }
-
- /**
-  * @param {boolean} isAnnounce
-  */
  async setAnnounce(isAnnounce) {
-  return this.client.groupSettingUpdate(this.jid, { announce: isAnnounce });
+  return this.updateSettings({ announce: isAnnounce });
  }
 
  async mute() {
-  return this.client.groupSettingUpdate(this.jid, 'announcement');
+  return this.updateSettings('announcement');
  }
-
  async unmute() {
-  return this.client.groupSettingUpdate(this.jid, 'not_announcement');
+  return this.updateSettings('not_announcement');
  }
-
  async lock() {
-  return this.client.groupSettingUpdate(this.jid, 'locked');
+  return this.updateSettings('locked');
  }
-
  async unlock() {
-  return this.client.groupSettingUpdate(this.jid, 'unlocked');
- }
-
- /**
-  * @param {string[]} participants
-  * @param {string} action
-  */
- async updateParticipants(participants, action) {
-  return this.client.groupParticipantsUpdate(this.jid, participants, action);
- }
-
- /**
-  * @param {string} name
-  */
- async changeName(name) {
-  return this.updateName(name);
- }
-
- /**
-  * @param {string} description
-  */
- async changeDescription(description) {
-  return this.updateDescription(description);
- }
-
- /**
-  * @param {string} jid
-  */
- async promoteAdmin(jid) {
-  return this.promote(jid);
- }
-
- /**
-  * @param {string} jid
-  */
- async demoteAdmin(jid) {
-  return this.demote(jid);
+  return this.updateSettings('unlocked');
  }
 
  async getGroupLink() {
@@ -259,9 +154,6 @@ class GroupManager extends Base {
   return `https://chat.whatsapp.com/${code}`;
  }
 
- /**
-  * @param {string} link
-  */
  async joinViaLink(link) {
   const code = link.split('https://chat.whatsapp.com/')[1];
   return this.joinByInvite(code);
@@ -270,45 +162,68 @@ class GroupManager extends Base {
  async getJoinRequests() {
   return this.client.groupRequestParticipantsList(this.jid);
  }
-
- /**
-  * @param {string} jid
-  */
  async approveRequest(jid) {
   return this.client.groupRequestParticipantsUpdate(this.jid, [jid], 'approve');
  }
-
- /**
-  * @param {string} jid
-  */
  async rejectRequest(jid) {
   return this.client.groupRequestParticipantsUpdate(this.jid, [jid], 'reject');
  }
-
- /**
-  * @param {string[]} jids
-  */
  async bulkApproveRequests(jids) {
   return this.client.groupRequestParticipantsUpdate(this.jid, jids, 'approve');
  }
-
- /**
-  * @param {string[]} jids
-  */
  async bulkRejectRequests(jids) {
   return this.client.groupRequestParticipantsUpdate(this.jid, jids, 'reject');
  }
 
  async getGroupStats() {
-  const metadata = await this.fetchMetadata();
-  const participants = metadata.participants;
+  await this.ensureMetadata();
+  const participants = this.metadata.participants;
   return {
    memberCount: participants.length,
    adminCount: participants.filter((p) => p.admin).length,
-   creationTime: metadata.creation,
-   description: metadata.desc,
-   owner: metadata.owner,
+   creationTime: this.metadata.creation,
+   description: this.metadata.desc,
+   owner: this.metadata.owner,
   };
+ }
+
+ async kickInactiveMembers(days) {
+  const participants = await this.fetchParticipants();
+  const now = Date.now();
+  const inactiveMembers = participants.filter((p) => {
+   return !p.admin && now - p.lastKnownPresence > days * 24 * 60 * 60 * 1000;
+  });
+  return this.remove(inactiveMembers.map((m) => m.id));
+ }
+
+ async massMessage(message, filter = () => true) {
+  const participants = await this.fetchParticipants();
+  const eligibleParticipants = participants.filter(filter);
+  for (const participant of eligibleParticipants) {
+   await this.client.sendMessage(participant.id, { text: message });
+  }
+ }
+
+ async pollMembers(question, options) {
+  return this.client.sendMessage(this.jid, {
+   poll: {
+    name: question,
+    values: options,
+    selectableCount: 1,
+   },
+  });
+ }
+
+ async getActiveMembers(hours = 24) {
+  const participants = await this.fetchParticipants();
+  const now = Date.now();
+  return participants.filter((p) => now - p.lastKnownPresence < hours * 60 * 60 * 1000);
+ }
+
+ async setGroupRules(rules) {
+  const description = await this.fetchMetadata().then((m) => m.desc);
+  const updatedDescription = `${description}\n\nGroup Rules:\n${rules}`;
+  return this.updateDescription(updatedDescription);
  }
 }
 
