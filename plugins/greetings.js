@@ -1,5 +1,5 @@
 const { bot } = require('../utils');
-const { getGreetings, setWelcome, setGoodbye } = require('./greetingsModel');
+const { getGreetings, setWelcome, setGoodbye } = require('../lib');
 
 const formatMessage = async (message, user, groupName, client) => {
   const groupMetadata = await client.groupMetadata(message.jid);
