@@ -73,9 +73,8 @@ bot(
   dontAddCommandList: true,
  },
  async (message) => {
-  let commandListText = '\t\t```Command List```\n';
+  let commandListText = '*about commands*\n';
   const commandList = [];
-
   commands.forEach((command) => {
    if (command.pattern && !command.dontAddCommandList) {
     const commandName = command.pattern.toString().split(/\W+/)[2];
@@ -83,14 +82,12 @@ bot(
     commandList.push({ name: commandName, description });
    }
   });
-
   commandList.sort((a, b) => a.name.localeCompare(b.name));
   commandList.forEach(({ name, description }, index) => {
    commandListText += `\`\`\`${index + 1} ${name.trim()}\`\`\`\n`;
    commandListText += `Use: \`\`\`${description}\`\`\`\n\n`;
   });
-
-  return await message.sendMessage(message.jid, commandListText.trim());
+  return await message.reply(tiny(commandListText));
  }
 );
 
