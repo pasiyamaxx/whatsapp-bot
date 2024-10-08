@@ -285,15 +285,29 @@ bot(
  }
 );
 
-// bot(
-//   {
-//     pattern: 'getpp ?(.*)',
-//     fromMe: true,
-//     desc: 'Fetches User Profile Photo',
-//     type: 'whatsapp'
-//   },
-//   async (message,match,m,client,bot) => {
-//     const quotedMessage = message.reply_message?.sender || message.mention?.[0];
+bot(
+ {
+  pattern: 'scall ?(.*)',
+  fromMe: true,
+  desc: 'Send a scheduled call message',
+  type: 'whatsapp',
+ },
+ async (message, match, m, client) => {
+  if (!message.isGroup) return await message.reply('_This command is for groups_');
+  if (!match) return await message.reply('*Need timeOut, title, and type!*\n_Example: .scall 1,Hello world,voice_');
+  const [timeoutStr, title, callType] = match.split(',');
+  if (!timeoutStr || !title || !callType) return await message.reply('*Need timeOut, title, and type!*\n_Example: .scall 1,Hello world,voice_');
+  const timeout = parseInt(timeoutStr, 10);
+  const scheduledTimestampMs = (Date.now() + timeout * 60000).toString();
 
-//   }
-// )
+  const scheduledCallMessage = {
+   scheduledCallCreationMessage: {
+    callType: callType.trim() === 'video' ? 2 : 1,
+    title: title.trim(),
+    scheduledTimestampMs,
+   },
+  };
+
+  await client.relayMessage(message.jid, scheduledCallMessage, {});
+ }
+);

@@ -77,7 +77,7 @@ bot(
   }
   if (args[0] === 'off') {
    await AntiWord.destroy({ where: { groupJid: message.jid } });
-   return message.reply('AntiWord feature turned off. All forbidden words removed.');
+   return message.reply('*AntiWord feature turned off.*\n_All forbidden words removed._');
   }
   let added = [];
   let existing = [];
