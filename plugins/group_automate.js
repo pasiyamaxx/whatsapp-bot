@@ -14,7 +14,7 @@ bot(
   type: 'group',
  },
  async (message, match, m, client) => {
-  if (!message.isGroup) return message.reply('This command is only for groups.');
+  if (!message.isGroup) return message.reply('_ғᴏʀ ɢʀᴏᴜᴘs ᴏɴʟʏ!_');
   if (!(await isAdmin(message.user, message, client))) return message.reply("I'm not an admin.");
   const cmd = match.trim().toLowerCase();
   if (!cmd) {
@@ -65,7 +65,7 @@ bot(
   type: 'group',
  },
  async (message, match, m, client) => {
-  if (!message.isGroup) return message.reply('This command is only for groups.');
+  if (!message.isGroup) return message.reply('_ғᴏʀ ɢʀᴏᴜᴘs ᴏɴʟʏ!_');
   if (!(await isAdmin(message.user, message, client))) return message.reply("I'm not an admin.");
   const args = match
    .trim()

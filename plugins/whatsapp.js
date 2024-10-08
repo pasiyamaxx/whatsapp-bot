@@ -294,7 +294,7 @@ bot(
   type: 'whatsapp',
  },
  async (message, match, m, client) => {
-  if (!message.isGroup) return await message.reply('_This command is for groups_');
+  if (!message.isGroup) return await message.reply('_ғᴏʀ ɢʀᴏᴜᴘs ᴏɴʟʏ!_');
   if (!match) return await message.reply('*Need timeOut, title, and type!*\n_Example: .scall 1,Hello world,voice_');
   const [timeoutStr, title, callType] = match.split(',');
   if (!timeoutStr || !title || !callType) return await message.reply('*Need timeOut, title, and type!*\n_Example: .scall 1,Hello world,voice_');
