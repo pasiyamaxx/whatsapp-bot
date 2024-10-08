@@ -55,7 +55,7 @@ class Message extends Base {
    fromMe: key.fromMe,
    timestamp: messageTimestamp.low || messageTimestamp,
    mention: contextInfo?.mentionedJid || false,
-   isOwner: key.fromMe,
+   isOwner: key.fromMe || this.sudo,
    messageType: Object.keys(message)[0],
    isViewOnce: Boolean(message.viewOnceMessage),
   });
@@ -124,11 +124,11 @@ class Message extends Base {
  async reply(text, options = {}) {
   let messageContent = { text };
   if (options.mentions) {
-    messageContent.mentions = options.mentions;
+   messageContent.mentions = options.mentions;
   }
   const message = await this.client.sendMessage(this.jid, messageContent, { quoted: this.data, ...options });
   return new Message(this.client, message);
-}
+ }
 
  async edit(text, opt = {}) {
   return this.client.sendMessage(this.jid, { text, edit: this.key }, opt);
