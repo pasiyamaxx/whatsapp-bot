@@ -113,8 +113,8 @@ bot(
   desc: 'Search Wikipedia for a query',
   type: 'search',
  },
- async (message, match) => {
-  if (!match) return await message.sendMessage('Please provide a search query.');
+ async (message, match, m, client) => {
+  if (!match) return await message.reply('*_Provide Search Query_*');
   const query = encodeURIComponent(match);
   const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${query}`;
   const response = await getJson(url);
@@ -193,27 +193,6 @@ bot(
 
 bot(
  {
-  pattern: 'lyrics2 ?(.*)',
-  fromMe: false,
-  desc: 'Search for song lyrics',
-  type: 'search',
- },
- async (message, match) => {
-  if (!match) return await message.reply('_Please provide a song title or artist._');
-
-  const query = encodeURIComponent(match);
-  const url = `https://api.lyrics.ovh/v1/${query}`;
-  const response = await axios.get(url);
-  if (response.data.lyrics) {
-   await message.reply(`*Lyrics:*\n\n${response.data.lyrics}`);
-  } else {
-   await message.reply('Lyrics not found.');
-  }
- }
-);
-
-bot(
- {
   pattern: 'crypto ?(.*)',
   fromMe: false,
   desc: 'Get current price of a cryptocurrency',
@@ -262,9 +241,8 @@ bot(
   desc: 'Search for a GitHub user',
   type: 'search',
  },
- async (message, match) => {
+ async (message, match, m, client) => {
   if (!match) return await message.reply('Please provide a GitHub username.');
-
   const query = encodeURIComponent(match);
   const url = `https://api.github.com/users/${query}`;
   const response = await axios.get(url);
