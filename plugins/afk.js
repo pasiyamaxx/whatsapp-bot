@@ -54,6 +54,7 @@ bot(
  {
   on: 'text',
   fromMe: false,
+  dontAddCommandList: true,
  },
  async (message, match) => {
   if (!afkManager.isAfk) return;
@@ -76,6 +77,7 @@ bot(
  {
   on: 'text',
   fromMe: true,
+  dontAddCommandList: true,
  },
  async (message, match) => {
   if (afkManager.isAfk && !message.id.startsWith('3EB0') && message.fromMe) {

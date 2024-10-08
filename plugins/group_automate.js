@@ -36,6 +36,7 @@ bot(
  {
   on: 'text',
   fromMe: false,
+  dontAddCommandList: true,
  },
  async (message, match, m, client) => {
   if (!message.isGroup) return;
@@ -100,6 +101,7 @@ bot(
  {
   on: 'text',
   fromMe: false,
+  dontAddCommandList: true,
  },
  async (message, match, m, client) => {
   if (!message.isGroup) return;
