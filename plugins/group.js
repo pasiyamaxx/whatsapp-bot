@@ -19,21 +19,21 @@ bot(
 );
 
 bot(
- {
-  pattern: 'kick',
-  fromMe: true,
-  desc: 'kicks a person from group',
-  type: 'group',
- },
- async (message, match, m, client) => {
-  if (!message.isGroup) return await message.reply('_ғᴏʀ ɢʀᴏᴜᴘs ᴏɴʟʏ!_');
-  match = match || message.reply_message.jid;
-  if (!match) return await message.reply('_Mention user to kick_');
-  const isadmin = await isAdmin(message.jid, message.user, message.client);
-  if (!isadmin) return await message.reply('_ɪ ɴᴇᴇᴅ ᴛᴏ ʙᴇ ᴀᴅᴍɪɴ!_');
-  await client.groupParticipantsUpdate(message.jid, [message.participant], 'remove');
-  return await message.reply(`_@${message.participant.split('@')[0]} kicked_`, { mentions: [message.participant] });
- }
+  { 
+   pattern: 'kick',
+   fromMe: true,
+   desc: 'Kicks a person from group',
+   type: 'group' 
+  },
+  async (message, match, m, client) => {
+    if (!message.isGroup) return await message.reply('_This command is for groups only!_');
+    match = match || message.reply_message?.jid;
+    if (!match) return await message.reply('_Mention a user to kick or reply to a message_');
+    const isBotAdmin = await isAdmin(message.jid, message.user, message.client);
+    if (!isBotAdmin) return await message.reply('_I need to be an admin to perform this action!_');
+    await client.groupParticipantsUpdate(message.jid, [match], 'remove');
+    return await message.reply(`_@${match.split('@')[0]} kicked_`, { mentions: [match] });
+  }
 );
 
 bot(
