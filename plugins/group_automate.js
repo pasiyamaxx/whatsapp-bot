@@ -13,7 +13,7 @@ bot(
   desc: 'Set AntiLink on | off | delete | kick',
   type: 'group',
  },
- async (message, match, m, client) => {
+ async (message, match, client) => {
   if (!message.isGroup) return message.reply('This command is only for groups.');
   if (!(await isAdmin(message.user, message, client))) return message.reply("I'm not an admin.");
   const cmd = match.trim().toLowerCase();
@@ -40,7 +40,9 @@ bot(
  async (message, match, m, client) => {
   if (!message.isGroup) return;
   const settings = await getAntiLink(message.jid);
-  if (!settings || (await isAdmin(message.participant, message, client))) return;
+  if (!settings) return;
+  const isUserAdmin = await isAdmin(message.participant, message, client);
+  if (isUserAdmin) return;
   const hasLink = /(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-&?=%.]+/gi.test(message.text);
   if (hasLink) {
    await client.sendMessage(message.jid, { delete: message.key });

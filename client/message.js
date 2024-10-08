@@ -122,9 +122,13 @@ class Message extends Base {
  }
 
  async reply(text, options = {}) {
-  const message = await this.client.sendMessage(this.jid, { text }, { quoted: this.data, ...options });
+  let messageContent = { text };
+  if (options.mentions) {
+    messageContent.mentions = options.mentions;
+  }
+  const message = await this.client.sendMessage(this.jid, messageContent, { quoted: this.data, ...options });
   return new Message(this.client, message);
- }
+}
 
  async edit(text, opt = {}) {
   return this.client.sendMessage(this.jid, { text, edit: this.key }, opt);
