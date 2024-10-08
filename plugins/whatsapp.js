@@ -196,6 +196,7 @@ bot(
   on: 'delete',
   fromMe: false,
   desc: 'Logs the recent deleted message',
+  dontAddCommandList: true,
  },
  async (message, match) => {
   if (!DELETED_LOG) return;

@@ -142,6 +142,7 @@ const requireJS = async (dir, { recursive = false, fileFilter = (f) => path.extn
    try {
     return require(filePath);
    } catch (err) {
+    console.error(`Error in file: ${filePath}\n${err.stack}`);
     return null;
    }
   })
