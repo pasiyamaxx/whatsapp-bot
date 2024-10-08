@@ -147,7 +147,7 @@ bot(
  }
 );
 
-Module(
+bot(
  {
   pattern: 'forward ?(.*)',
   fromMe: false,
