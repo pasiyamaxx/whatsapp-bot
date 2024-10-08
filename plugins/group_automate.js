@@ -13,7 +13,7 @@ bot(
   desc: 'Set AntiLink on | off | delete | kick',
   type: 'group',
  },
- async (message, match, client) => {
+ async (message, match, m, client) => {
   if (!message.isGroup) return message.reply('This command is only for groups.');
   if (!(await isAdmin(message.user, message, client))) return message.reply("I'm not an admin.");
   const cmd = match.trim().toLowerCase();
