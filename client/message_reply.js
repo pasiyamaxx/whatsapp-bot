@@ -20,6 +20,7 @@ class ReplyMessage extends Base {
   this.jid = participant || '';
   this.sudo = this.jid ? config.SUDO.split(',').includes(this.jid.split('@')[0]) : false;
   this.fromMe = this.jid ? parsedJid(this.client.user.jid)[0] === parsedJid(this.jid)[0] : false;
+  this.participant = parsedJid(data.sender)[0];
 
   if (quotedMessage) this.processQuotedMessage(quotedMessage);
 

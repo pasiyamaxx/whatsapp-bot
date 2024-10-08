@@ -20,7 +20,7 @@ class GroupManager extends Base {
    jid: key.remoteJid,
    senderID,
    pushName,
-   participant: parsedJid(senderID)[0],
+   participant: parsedJid(data.sender)[0],
    isSudo: config.SUDO.split(',').includes(this.participant?.split('@')[0]) || false,
    fromMe: key.fromMe,
    isOwner: key.fromMe,

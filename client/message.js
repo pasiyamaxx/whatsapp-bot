@@ -49,7 +49,7 @@ class Message extends Base {
    message: { key, message },
    pushName,
    sender: pushName,
-   participant: parsedJid(senderID)[0],
+   participant: parsedJid(data.sender)[0],
    sudo: config.SUDO.split(',').includes(this.participant?.split('@')[0]) || false,
    text: data.body,
    fromMe: key.fromMe,
