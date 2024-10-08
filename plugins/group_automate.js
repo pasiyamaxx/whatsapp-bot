@@ -1,5 +1,5 @@
 const { bot } = require('../utils');
-const { getAntiLink, setAntiLink, deleteAntiLink, AntiWord, addAntiWord, removeAntiWord, getAntiWords } = require('../lib');
+const { getAntiLink, setAntiLink, deleteAntiLink, AntiWord, addAntiWord, getAntiWords } = require('../lib');
 
 const isAdmin = async (jid, message, client) => {
  const metadata = await client.groupMetadata(message.jid).catch(() => null);
