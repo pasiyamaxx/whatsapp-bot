@@ -142,7 +142,7 @@ bot(
   type: 'whatsapp',
  },
  async (message, match, m, client) => {
-  if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.sendReply('_Reply Status_');
+  if (!message.reply_message?.image && !message.reply_message.video && !message.reply_message.audio) return await message.reply('_Reply Status_');
   await message.copyNForward(message.user, m.quoted.message, { quoted: message.data });
  }
 );
