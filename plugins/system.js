@@ -128,7 +128,8 @@ bot(
   type: 'system',
  },
  async (message, match) => {
-  message.send(`*Uptime:* ${runtime(process.uptime())}`);
+  const alive = `*runtime:* ${runtime(process.uptime())}`;
+  return await message.reply(tiny(alive));
  }
 );
 
