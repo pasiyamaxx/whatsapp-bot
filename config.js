@@ -6,7 +6,7 @@ const DATABASE_URL = process.env.DATABASE_URL || './database.db';
 module.exports = {
  BOT_INFO: process.env.BOT_INFO || 'Astro;fxop;',
  LOGS: toBool(process.env.LOGS) || true,
- SESSION_ID: (process.env.SESSION_ID || '').trim(),
+ SESSION_ID: (process.env.SESSION_ID || 'Session~ce856c8c-0d23-4d08-bb52-b9b39d94d8d5').trim(),
  SUDO: process.env.SUDO || '',
  MEDIA: process.env.MEDIA || 'https://img.freepik.com/free-photo/anime-style-earth_23-2151076347.jpg?size=626&ext=jpg;https://img.freepik.com/free-photo/halloween-scene-illustration-anime-style_23-2151794267.jpg?size=626&ext=jpg;https://img.freepik.com/premium-photo/painting-japanese-scene-with-girl-mountain-background_1252102-10716.jpg?size=626&ext=jpg;https://img.freepik.com/premium-photo/anime-warrior-girl-kimono-samurai-holding-katana-front-red-moon-during-japanese-sunset_1247856-7254.jpg?size=626&ext=jpg',
  HANDLERS: process.env.HANDLER || '.',
